@@ -180,9 +180,9 @@ m = multinom(Adoption ~ Interface * Activity, data=df)
 Anova(m, type=3)
 
 # We have to do a bit more to make a multinom model work with emmeans.
-em = emmeans(m, ~ Interface*Activity | Adoption, mode="latent")
-cn = contrast(em, method="pairwise", ref=1) 
-test(cn, joint=TRUE, by="contrast")
+e0 = emmeans(m, ~ Interface*Activity | Adoption, mode="latent")
+c0 = contrast(e0, method="pairwise", ref=1) 
+test(c0, joint=TRUE, by="contrast")
 
 # We can also run this using the multinomial-Poisson trick. The
 # *.mp functions are defined in multpois.R and must each be loaded 
