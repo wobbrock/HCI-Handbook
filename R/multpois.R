@@ -7,7 +7,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last updated: 10/05/2024
+### Last updated: 10/08/2024
 ###
 ### Implements the multinomial-Poisson trick for multinomial
 ### and mixed multinomial regression models. For between-Ss.
@@ -401,7 +401,7 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
 ##
 #### Anova.mp ####
 ##
-Anova.mp <- function(model, type=c("II", "III", 2, 3)) 
+Anova.mp <- function(model, type=c(3, 2, "III", "II")) 
 {
   # ensure the model is of class "glm" or "glmerMod"
   mtype = as.list(class(model))
