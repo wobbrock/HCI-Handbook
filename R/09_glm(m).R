@@ -176,7 +176,7 @@ mosaicplot(xt, main="Adoption by Interface, Activity", col=c("lightyellow","pink
 
 # Unfortunately, there is no family=multinomial option for glm. But
 # fortunately, nnet::multinom offers an equivalent we can use.
-m = multinom(Adoption ~ Interface * Activity, data=df)
+m = multinom(Adoption ~ Interface * Activity, data=df, trace=FALSE)
 Anova(m, type=3)
 
 # We have to do a bit more to make a multinom model work with emmeans.
