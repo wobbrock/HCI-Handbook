@@ -7,7 +7,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last updated: 10/08/2024
+### Last updated: 10/10/2024
 ###
 ### Implements the multinomial-Poisson trick for multinomial
 ### and mixed multinomial regression models. For between-Ss.
@@ -82,9 +82,8 @@ glm.mp <- function(formula, data)
   DV = formula[[2]] # D.V.
   
   # ensure D.V. is nominal
-  dvtype = as.list(class(data[[DV]]))
-  if (any(dvtype != "factor")) {
-    stop("glm.mp is only valid for nominal dependent variables. ", DV, " is of type ", paste0(unlist(dvtype), collapse =", "), ".")
+  if (!is.factor(data[[DV]])) {
+    stop("glm.mp is only valid for nominal dependent variables (i.e., factors).\n\t", DV, " is of type ", class(data[[DV]]))
   }
   
   # get the independent variables from the formula
@@ -132,9 +131,8 @@ glmer.mp <- function(formula, data)
   DV = formula[[2]] # D.V.
   
   # ensure D.V. is nominal
-  dvtype = as.list(class(data[[DV]]))
-  if (any(dvtype != "factor")) {
-    stop("glmer.mp is only valid for nominal dependent variables. ", DV, " is of type ", paste0(unlist(dvtype), collapse =", "), ".")
+  if (!is.factor(data[[DV]])) {
+    stop("glmer.mp is only valid for nominal dependent variables (i.e., factors).\n\t", DV, " is of type ", class(data[[DV]]))
   }
   
   # get the independent variables from the formula
@@ -187,7 +185,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
   # ensure the model is of class "glm"
   mtype = as.list(class(model))
   if (!any(mtype == "glm")) {
-    stop("glm.mp.con requires a model created by glm.mp")
+    stop("glm.mp.con requires a model created by glm.mp.")
   }
 
   # get the data frame used for the model
@@ -207,9 +205,26 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
     stop("glm.mp.con requires a model without random factors.")
   }
 
-  # get our contrast formula terms and I.V.s
+  # get our contrast formula I.V.s
   t = terms(formula)
   IVs = as.list(attr(t, "variables"))[c(-1,-2)]
+  
+  # ensure all contrast I.V.s were in the original model formula
+  if (!any(IVs %in% iv0)) {
+    stop("glm.mp.con requires formula terms to be present in the model.")
+  }
+  
+  # warn if any contrast formula I.V.s are not factors
+  ivnotfac = laply(IVs, function(term) !is.factor(df[[term]]))
+  if (any(ivnotfac)) {
+    snf = ""
+    for (i in 1:length(ivnotfac)) {
+      if (ivnotfac[i]) {
+        snf = paste0(snf, '\n\t', IVs[[i]], " is of type ", class(df[[ IVs[[i]] ]]))
+      }
+    }
+    warning("glm.mp.con makes little sense for terms that are not factors:", snf, immediate.=TRUE)
+  }
 
   # build our new composite factor name and column values
   facname = IVs[[1]]
@@ -315,11 +330,28 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
     stop("glmer.mp.con requires a model with a random factor, e.g., (1|S) or (X|S).")
   }
   
-  # get our contrast formula terms and I.V.s
+  # get our contrast formula I.V.s
   t = terms(formula)
   IVs = as.list(attr(t, "variables"))[c(-1,-2)]
   
-  # build our new factor name and values
+  # ensure all contrast I.V.s were in the original model formula
+  if (!any(IVs %in% iv0)) {
+    stop("glmer.mp.con requires formula terms to be present in the model.")
+  }
+  
+  # warn if any contrast formula I.V.s are not factors
+  ivnotfac = laply(IVs, function(term) !is.factor(df[[term]]))
+  if (any(ivnotfac)) {
+    snf = ""
+    for (i in 1:length(ivnotfac)) {
+      if (ivnotfac[i]) {
+        snf = paste0(snf, '\n\t', IVs[[i]], " is of type ", class(df[[ IVs[[i]] ]]))
+      }
+    }
+    warning("glmer.mp.con makes little sense for terms that are not factors:", snf, immediate.=TRUE)
+  }
+  
+  # build our new composite factor name and column values
   facname = IVs[[1]]
   facvals = df[[ IVs[[1]] ]]
   if (length(IVs) > 1) {
