@@ -7,7 +7,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last updated: 10/10/2024
+### Last updated: 10/11/2024
 ###
 ### Implements the multinomial-Poisson trick for multinomial
 ### and mixed multinomial regression models. For between-Ss.
@@ -72,29 +72,32 @@ library(car)   # for Anova
 ##
 glm.mp <- function(formula, data)
 {
-  # ensure there is only one D.V.
+  # ensure there is some D.V.
   t = terms(formula)
   if (attr(t, "response") != 1) {
-    stop("glm.mp is only valid for one dependent variable. You have ", attr(t, "response"), ".")
+    stop("glm.mp requires a formula with a dependent variable on the left-hand side.")
   }
   
-  # get the one D.V.
-  DV = formula[[2]] # D.V.
-  
+  # ensure there is only one D.V.
+  DV = all.vars(formula[[2]])
+  if (length(DV) != 1) {
+    stop("glm.mp is only valid for one dependent variable. You have ", length(DV), ".")
+  }
+   
   # ensure D.V. is nominal
   if (!is.factor(data[[DV]])) {
     stop("glm.mp is only valid for nominal dependent variables (i.e., factors).\n\t", DV, " is of type ", class(data[[DV]]))
   }
-  
+
   # get the independent variables from the formula
   IVs = as.list(attr(t, "variables"))[c(-1,-2)]
-  
+
   # ensure there are no random factors in the formula
   hasrnd = laply(IVs, function(term) as.list(term)[[1]] == quote(`|`))
   if (any(hasrnd)) {
     stop("glm.mp is only valid for formulas without random factors.")
   }
-  
+
   # transform data table
   df = dfidx(data, choice=DV, shape="wide", drop.index=FALSE, idnames=c("chid","alt"))
 
@@ -121,14 +124,17 @@ glm.mp <- function(formula, data)
 ##
 glmer.mp <- function(formula, data)
 {
-  # ensure there is only one D.V.
+  # ensure there is some D.V.
   t = terms(formula)
   if (attr(t, "response") != 1) {
-    stop("glmer.mp is only valid for one dependent variable. You have ", attr(t, "response"), ".")
+    stop("glm.mp requires a formula with a dependent variable on the left-hand side.")
   }
   
-  # get the one D.V.
-  DV = formula[[2]] # D.V.
+  # ensure there is only one D.V.
+  DV = all.vars(formula[[2]])
+  if (length(DV) != 1) {
+    stop("glmer.mp is only valid for one dependent variable. You have ", length(DV), ".")
+  }
   
   # ensure D.V. is nominal
   if (!is.factor(data[[DV]])) {
@@ -214,7 +220,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
     stop("glm.mp.con requires formula terms to be present in the model.")
   }
   
-  # warn if any contrast formula I.V.s are not factors
+  # ensure all contrast formula I.V.s are factors
   ivnotfac = laply(IVs, function(term) !is.factor(df[[term]]))
   if (any(ivnotfac)) {
     snf = ""
@@ -223,7 +229,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
         snf = paste0(snf, '\n\t', IVs[[i]], " is of type ", class(df[[ IVs[[i]] ]]))
       }
     }
-    warning("glm.mp.con makes little sense for terms that are not factors:", snf, immediate.=TRUE)
+    stop("glm.mp.con requires formula terms to be factors:", snf)
   }
 
   # build our new composite factor name and column values
@@ -339,7 +345,7 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
     stop("glmer.mp.con requires formula terms to be present in the model.")
   }
   
-  # warn if any contrast formula I.V.s are not factors
+  # ensure all contrast formula I.V.s are factors
   ivnotfac = laply(IVs, function(term) !is.factor(df[[term]]))
   if (any(ivnotfac)) {
     snf = ""
@@ -348,7 +354,7 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
         snf = paste0(snf, '\n\t', IVs[[i]], " is of type ", class(df[[ IVs[[i]] ]]))
       }
     }
-    warning("glmer.mp.con makes little sense for terms that are not factors:", snf, immediate.=TRUE)
+    stop("glm.mp.con requires formula terms to be factors:", snf)
   }
   
   # build our new composite factor name and column values
