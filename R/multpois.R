@@ -7,7 +7,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last updated: 10/11/2024
+### Last updated: 10/12/2024
 ###
 ### Implements the multinomial-Poisson trick for multinomial
 ### and mixed multinomial regression models. For between-Ss.
@@ -275,7 +275,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
       # improve our row
       rownames(a)[1] = paste0(lvls[i], " - ", lvls[j]) # update contrast label
       colnames(a)[3] = "p.value" # simplify p-value label
-      a = mutate(a, .after=Df, N=nrow(d0)/length(levels(df$alt))) # insert N
+      a = mutate(a, .after="Df", N=nrow(d0)/length(levels(df$alt))) # insert N
 
       # create a new output row entry and add it to our output table
       r = list(Contrast = rownames(a)[1],
@@ -408,7 +408,7 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
       # improve our row
       rownames(a)[1] = paste0(lvls[i], " - ", lvls[j]) # update contrast label
       colnames(a)[3] = "p.value" # simplify p-value label
-      a = mutate(a, .after=Df, N=nrow(d0)/length(levels(df$alt))) # insert N
+      a = mutate(a, .after="Df", N=nrow(d0)/length(levels(df$alt))) # insert N
 
       # create a new output row entry and add it to our output table
       r = list(Contrast = rownames(a)[1], 
@@ -467,7 +467,7 @@ Anova.mp <- function(model, type=c(3, 2, "III", "II"))
   h = attr(a, "heading") # save
 
   # insert N for chisq result
-  a = mutate(.data=a, .after=Df, N=nrow(df)/length(levels(df$alt)))
+  a = mutate(.data=a, .after="Df", N=nrow(df)/length(levels(df$alt)))
 
   # extract relevant effect entries
   a = a[grep(":alt", rownames(a), fixed=TRUE),]
