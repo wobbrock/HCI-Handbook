@@ -7,7 +7,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last updated: 10/12/2024
+### Last updated: 10/20/2024
 ###
 ### Implements the multinomial-Poisson trick for multinomial
 ### and mixed multinomial regression models. For between-Ss.
@@ -70,23 +70,28 @@ library(car)   # for Anova
 ##
 #### glm.mp ####
 ##
-glm.mp <- function(formula, data)
+glm.mp <- function(formula, data, ...)
 {
+  # ensure data is a proper data frame
+  if (!is.data.frame(data)) {
+    stop("'data' must be a long-format data frame.")
+  }
+  
   # ensure there is some D.V.
   t = terms(formula)
   if (attr(t, "response") != 1) {
-    stop("glm.mp requires a formula with a dependent variable on the left-hand side.")
+    stop("'formula' must have a dependent variable on the left-hand side.")
   }
   
   # ensure there is only one D.V.
   DV = all.vars(formula[[2]])
   if (length(DV) != 1) {
-    stop("glm.mp is only valid for one dependent variable. You have ", length(DV), ".")
+    stop("'formula' must only have one dependent variable. You have ", length(DV), ".")
   }
    
   # ensure D.V. is nominal
   if (!is.factor(data[[DV]])) {
-    stop("glm.mp is only valid for nominal dependent variables (i.e., factors).\n\t", DV, " is of type ", class(data[[DV]]))
+    stop("'formula' must have a nominal dependent variable of type 'factor'.\n\t", DV, " is of type ", class(data[[DV]]))
   }
 
   # get the independent variables from the formula
@@ -95,7 +100,19 @@ glm.mp <- function(formula, data)
   # ensure there are no random factors in the formula
   hasrnd = laply(IVs, function(term) as.list(term)[[1]] == quote(`|`))
   if (any(hasrnd)) {
-    stop("glm.mp is only valid for formulas without random factors.")
+    stop("'formula' cannot have random factors.")
+  }
+  
+  # ensure any optional arguments do not specify a formula, data frame, or family
+  optargs = list(...)
+  if (exists("formula", where=optargs)) {
+    stop("'...' cannot contain a 'formula' argument.")
+  }
+  if (exists("data", where=optargs)) {
+    stop("'...' cannot contain a 'data' argument.")
+  }
+  if (exists("family", where=optargs)) {
+    stop("'...' cannot contain a 'family' argument.")
   }
 
   # transform data table
@@ -114,7 +131,7 @@ glm.mp <- function(formula, data)
   f = update.formula(formula, . ~ . * alt)
 
   # build and return our model
-  m = glm(f, data=df, family=poisson) # m-P trick
+  m = glm(formula=f, data=df, family=poisson, ...) # m-P trick
   return (m)
 }
 
@@ -122,23 +139,28 @@ glm.mp <- function(formula, data)
 ##
 #### glmer.mp ####
 ##
-glmer.mp <- function(formula, data)
+glmer.mp <- function(formula, data, ...)
 {
+  # ensure data is a proper data frame
+  if (!is.data.frame(data)) {
+    stop("'data' must be a long-format data frame.")
+  }
+  
   # ensure there is some D.V.
   t = terms(formula)
   if (attr(t, "response") != 1) {
-    stop("glm.mp requires a formula with a dependent variable on the left-hand side.")
+    stop("'formula' must have a dependent variable on the left-hand side.")
   }
   
   # ensure there is only one D.V.
   DV = all.vars(formula[[2]])
   if (length(DV) != 1) {
-    stop("glmer.mp is only valid for one dependent variable. You have ", length(DV), ".")
+    stop("'formula' must only have one dependent variable. You have ", length(DV), ".")
   }
   
   # ensure D.V. is nominal
   if (!is.factor(data[[DV]])) {
-    stop("glmer.mp is only valid for nominal dependent variables (i.e., factors).\n\t", DV, " is of type ", class(data[[DV]]))
+    stop("'formula' must have a nominal dependent variable of type 'factor'.\n\t", DV, " is of type ", class(data[[DV]]))
   }
   
   # get the independent variables from the formula
@@ -147,7 +169,19 @@ glmer.mp <- function(formula, data)
   # ensure there is a random factor in the formula
   hasrnd = laply(IVs, function(term) as.list(term)[[1]] == quote(`|`))
   if (!any(hasrnd)) {
-    stop("glmer.mp is only valid for formulas with random factors, e.g., (1|S) or (X|S).")
+    stop("'formula' must have at least one random factor, e.g., (1|PId) or (X|PId).")
+  }
+  
+  # ensure any optional arguments do not specify a formula, data frame, or family
+  optargs = list(...)
+  if (exists("formula", where=optargs)) {
+    stop("'...' cannot contain a 'formula' argument.")
+  }
+  if (exists("data", where=optargs)) {
+    stop("'...' cannot contain a 'data' argument.")
+  }
+  if (exists("family", where=optargs)) {
+    stop("'...' cannot contain a 'family' argument.")
   }
 
   # transform data table
@@ -173,7 +207,7 @@ glmer.mp <- function(formula, data)
   f = update.formula(f, . ~ . + alt) # add "alt" main effect
 
   # build and return our model
-  m = glmer(f, data=df, family=poisson) # m-P trick
+  m = glmer(formula=f, data=df, family=poisson, ...) # m-P trick
   return (m)
 }
 
@@ -181,25 +215,29 @@ glmer.mp <- function(formula, data)
 ##
 #### glm.mp.con ####
 ##
-glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonferroni","BH","BY","fdr","none"))
+glm.mp.con <- function(
+    model, 
+    formula, 
+    adjust=c("holm","hochberg","hommel","bonferroni","BH","BY","fdr","none"), 
+    ...)
 {
   # require the pairwise keyword
   if (formula[[2]] != "pairwise") {
-    stop("glm.mp.con requires the 'pairwise' keyword on the left hand side of the ~ .")
+    stop("'pairwise' is required on the left hand side of the ~ .")
   }
   
   # ensure the model is of class "glm"
   mtype = as.list(class(model))
   if (!any(mtype == "glm")) {
-    stop("glm.mp.con requires a model created by glm.mp.")
+    stop("'model' must be created by glm.mp.")
   }
 
   # get the data frame used for the model
   df = model.frame(model)
 
   # df must contain an "alt" factor column or this isn't a model built by glm.mp
-  if (!exists("alt", df)) {
-    stop("glm.mp.con requires a model created by glm.mp.")
+  if (!exists("alt", where=df)) {
+    stop("'model' must be created by glm.mp.")
   }
 
   # ensure there are no random factors in the original model formula
@@ -208,7 +246,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
   iv0 = as.list(attr(t0, "variables"))[c(-1,-2)]
   hasrnd = laply(iv0, function(term) as.list(term)[[1]] == quote(`|`))
   if (any(hasrnd)) {
-    stop("glm.mp.con requires a model without random factors.")
+    stop("'model' formula cannot have random factors.")
   }
 
   # get our contrast formula I.V.s
@@ -217,7 +255,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
   
   # ensure all contrast I.V.s were in the original model formula
   if (!any(IVs %in% iv0)) {
-    stop("glm.mp.con requires formula terms to be present in the model.")
+    stop("'formula' terms must be present in 'model'.")
   }
   
   # ensure all contrast formula I.V.s are factors
@@ -229,7 +267,19 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
         snf = paste0(snf, '\n\t', IVs[[i]], " is of type ", class(df[[ IVs[[i]] ]]))
       }
     }
-    stop("glm.mp.con requires formula terms to be factors:", snf)
+    stop("'formula' terms must be factors:", snf)
+  }
+  
+  # ensure any optional arguments do not specify a formula, data frame, or family
+  optargs = list(...)
+  if (exists("formula", where=optargs)) {
+    stop("'...' cannot contain a 'formula' argument.")
+  }
+  if (exists("data", where=optargs)) {
+    stop("'...' cannot contain a 'data' argument.")
+  }
+  if (exists("family", where=optargs)) {
+    stop("'...' cannot contain a 'family' argument.")
   }
 
   # build our new composite factor name and column values
@@ -247,7 +297,7 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
   lvls = levels(df[[facname]])
 
   # get our model's dependent variable
-  DV = formula(model)[[2]]
+  DV = f0[[2]]
 
   # now do each of the pairwise comparisons and store them in a table
   resdf <- data.frame(Contrast=character(), Chisq=numeric(), Df=numeric(), N=integer(), p.value=numeric())
@@ -268,9 +318,9 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
       f = as.formula(s) # convert to formula
 
       # finally, create our model and examine its effects
-      m = glm(f, data=d0, family=poisson) # m-P trick
+      m = glm(formula=f, data=d0, family=poisson, ...) # m-P trick
       a = Anova(m, type=3)
-      a = a[grep(":alt", rownames(a)),] # get relevant entry
+      a = a[grep(":alt", rownames(a), fixed=TRUE),] # get relevant entry
 
       # improve our row
       rownames(a)[1] = paste0(lvls[i], " - ", lvls[j]) # update contrast label
@@ -306,25 +356,29 @@ glm.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonf
 ##
 #### glmer.mp.con ####
 ##
-glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bonferroni","BH","BY","fdr","none"))
+glmer.mp.con <- function(
+    model, 
+    formula, 
+    adjust=c("holm","hochberg","hommel","bonferroni","BH","BY","fdr","none"), 
+    ...)
 {
   # require the pairwise keyword
   if (formula[[2]] != "pairwise") {
-    stop("glmer.mp.con requires the 'pairwise' keyword on the left hand side of the ~ .")
+    stop("'pairwise' is required on the left hand side of the ~ .")
   }
   
   # ensure the model is of class "glmerMod"
   mtype = as.list(class(model))
   if (!any(mtype == "glmerMod")) {
-    stop("glmer.mp.con requires a model created by glmer.mp.")
+    stop("'model' must be created by glmer.mp.")
   }
   
   # get the data frame used for the model
   df = model.frame(model)
   
   # df must contain an "alt" factor column or this isn't a model built by glmer.mp
-  if (!exists("alt", df)) {
-    stop("glmer.mp.con requires a model created by glmer.mp.")
+  if (!exists("alt", where=df)) {
+    stop("'model' must be created by glmer.mp.")
   }
   
   # ensure there is a random factor in the original model
@@ -333,7 +387,7 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
   iv0 = as.list(attr(t0, "variables"))[c(-1,-2)]
   hasrnd = laply(iv0, function(term) as.list(term)[[1]] == quote(`|`))
   if (!any(hasrnd)) {
-    stop("glmer.mp.con requires a model with a random factor, e.g., (1|S) or (X|S).")
+    stop("'model' formula must have at least one random factor, e.g., (1|PId) or (X|PId).")
   }
   
   # get our contrast formula I.V.s
@@ -342,7 +396,7 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
   
   # ensure all contrast I.V.s were in the original model formula
   if (!any(IVs %in% iv0)) {
-    stop("glmer.mp.con requires formula terms to be present in the model.")
+    stop("'formula' terms must be present in 'model'.")
   }
   
   # ensure all contrast formula I.V.s are factors
@@ -354,7 +408,19 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
         snf = paste0(snf, '\n\t', IVs[[i]], " is of type ", class(df[[ IVs[[i]] ]]))
       }
     }
-    stop("glm.mp.con requires formula terms to be factors:", snf)
+    stop("'formula' terms must be factors:", snf)
+  }
+  
+  # ensure any optional arguments do not specify a formula, data frame, or family
+  optargs = list(...)
+  if (exists("formula", where=optargs)) {
+    stop("'...' cannot contain a 'formula' argument.")
+  }
+  if (exists("data", where=optargs)) {
+    stop("'...' cannot contain a 'data' argument.")
+  }
+  if (exists("family", where=optargs)) {
+    stop("'...' cannot contain a 'family' argument.")
   }
   
   # build our new composite factor name and column values
@@ -401,9 +467,9 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
       f = as.formula(s) # convert to formula
       
       # finally, create our model and examine its effects
-      m = glmer(f, data=d0, family=poisson) # m-P trick
+      m = glmer(formula=f, data=d0, family=poisson, ...) # m-P trick
       a = Anova(m, type=3)
-      a = a[grep(":alt", rownames(a)),] # get relevant entry
+      a = a[grep(":alt", rownames(a), fixed=TRUE),] # get relevant entry
 
       # improve our row
       rownames(a)[1] = paste0(lvls[i], " - ", lvls[j]) # update contrast label
@@ -439,44 +505,106 @@ glmer.mp.con <- function(model, formula, adjust=c("holm","hochberg","hommel","bo
 ##
 #### Anova.mp ####
 ##
-Anova.mp <- function(model, type=c(3, 2, "III", "II")) 
+Anova.mp <- function(model, type=c(3, 2, 1, "III", "II", "I"))
 {
   # ensure the model is of class "glm" or "glmerMod"
   mtype = as.list(class(model))
   if (!any(mtype == "glm" | mtype == "glmerMod")) {
-    stop("Anova.mp requires a model created by glm.mp or glmer.mp.")
+    stop("'model' must be created by glm.mp or glmer.mp.")
   }
   
   # get the data frame used to create the model
   df = model.frame(model)
   
   # df must contain an "alt" factor column or this isn't a model built by glm.mp or glmer.mp
-  if (!exists("alt", df)) {
-    stop("Anova.mp requires a model created by glm.mp or glmer.mp.")
+  if (!exists("alt", where=df)) {
+    stop("'model' must be created by glm.mp or glmer.mp.")
   }
   
-  # get the Anova type
+  # get the ANOVA type
   type = as.character(type)
   type = match.arg(type)
+  type = if (type %in% c(1,"I")) {1}
+  else if (type %in% c(2,"II"))  {2}
+  else if (type %in% c(3,"III")) {3}
   
   # run the Anova
-  a = Anova(model, type)
+  a = NULL
+  if (type == 1) # type I ANOVA
+  {  
+    if (any(mtype == "glm")) { # glm.mp
+      a = anova(model, test="Chisq") # anova.glm
+      
+      # insert N for Chisq result
+      a = mutate(.data=a, .after="Df", "N"=nrow(df)/length(levels(df$alt)))
+      
+      # extract the rows that are interactions with "alt"
+      a = a[grep(":alt", rownames(a), fixed=TRUE),]
+      rownames(a) = sub(":alt", "", rownames(a), fixed=TRUE)
+      
+      # rename the Deviance column to be Chisq and move it first
+      colnames(a) = sub("Deviance", "Chisq", colnames(a), fixed=TRUE)
+      a = relocate(.data=a, "Chisq", .before="Df")
+      
+      # rename the Pr(>Chi) column to Pr(>Chisq) for consistency
+      colnames(a) = sub("Pr(>Chi)", "Pr(>Chisq)", colnames(a), fixed=TRUE)
+      
+      # remove unwanted columns
+      a[,"Resid. Df"] = NULL
+      a[,"Resid. Dev"] = NULL
+    }
+    else if (isGLMM(model)) { # glmer.mp
+      a = anova(model, refit=FALSE) # anova.merMod
+      
+      # extract the rows that are interactions with "alt"
+      a = a[grep(":alt", rownames(a), fixed=TRUE),]
+      rownames(a) = sub(":alt", "", rownames(a), fixed=TRUE)
+      
+      # rename the npar column to be Df
+      colnames(a) = sub("npar", "Df", colnames(a), fixed=TRUE)
+      
+      # insert N for Chisq result
+      a = mutate(.data=a, .after="Df", "N"=nrow(df)/length(levels(df$alt)))
+      
+      # rename the F value column to be Chisq and move it first
+      colnames(a) = sub("F value", "Chisq", colnames(a), fixed=TRUE)
+      a = relocate(.data=a, "Chisq", .before="Df")
+      
+      # add a p-value column
+      a = mutate(.data=a, .after="N", "Pr(>Chisq)"=1-pchisq(a$Chisq,a$Df))
+      
+      # remove unwanted columns
+      a[,"Sum Sq"] = NULL
+      a[,"Mean Sq"] = NULL
+    }
+    else {
+      stop("'model' must be created by glm.mp or glmer.mp.")
+    }
+    # make our output message the same as for the Type II and III tests
+    DV = formula(model)[[2]]
+    attr(a, "heading") = paste0("Analysis of Deviance Table (Type I tests)\n\nResponse: ", 
+                                DV, "\nvia the multinomial-Poisson trick")
+  }
+  else # type II or III ANOVA
+  { 
+    a = Anova(model, type)
 
-  # update our output heading
-  attr(a, "heading")[3] = "via the multinomial-Poisson trick"
-  h = attr(a, "heading") # save
+    # update our output heading
+    attr(a, "heading")[3] = "via the multinomial-Poisson trick"
+    h = attr(a, "heading") # save
 
-  # insert N for chisq result
-  a = mutate(.data=a, .after="Df", N=nrow(df)/length(levels(df$alt)))
+    # insert N for chisq result
+    a = mutate(.data=a, .after="Df", "N"=nrow(df)/length(levels(df$alt)))
 
-  # extract relevant effect entries
-  a = a[grep(":alt", rownames(a), fixed=TRUE),]
-  rownames(a) = sub(":alt", "", rownames(a))
+    # extract the rows that are interactions with "alt"
+    a = a[grep(":alt", rownames(a), fixed=TRUE),]
+    rownames(a) = sub(":alt", "", rownames(a), fixed=TRUE)
 
-  # make consistent
-  colnames(a)[1] = "Chisq"
+    # make consistent
+    colnames(a)[1] = "Chisq"
 
-  attr(a, "heading") = h # restore
+    attr(a, "heading") = h # restore
+  }
   return (a)
 }
 
