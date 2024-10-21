@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 10/20/2024
 ###
 
 ### BSD 2-Clause License
@@ -44,6 +44,7 @@ library(emmeans) # for emmeans
 library(lme4) # for glmer
 library(lmerTest)
 library(nnet) # for multinom
+library(multpois) # for glm*.mp*, Anova.mp
 library(MASS) # for polr, fitdistr, glm.nb
 library(ordinal) # for clmm
 library(RVAideMemoire) # for Anova.clmm
@@ -94,10 +95,7 @@ Anova(m, type=3)
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Interface*Activity, adjust="holm")
 
-# We can also run this using the multinomial-Poisson trick. The
-# *.mp functions are defined in multpois.R and must each be loaded 
-# into memory first. We can also get our post hoc pairwise comparisons 
-# this way.
+# We can also run this using the multinomial-Poisson trick using multpois::glm.mp.
 m0 = glm.mp(Adoption ~ Interface * Activity, data=df)
 Anova.mp(m0, type=3)
 glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
@@ -130,10 +128,7 @@ Anova(m, type=3)
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Interface*Activity, adjust="holm")
 
-# We can also run this using the multinomial-Poisson trick. The
-# *.mp functions are defined in multpois.R and must each be loaded 
-# into memory first. We can also get our post hoc pairwise comparisons 
-# this way.
+# We can also run this using the multinomial-Poisson trick using multpois::glmer.mp.
 m0 = glmer.mp(Adoption ~ Interface*Activity + (1|PId), data=df)
 Anova.mp(m0, type=3)
 glmer.mp.con(m0, pairwise ~ Interface * Activity, adjust="holm")
@@ -184,10 +179,7 @@ e0 = emmeans(m, ~ Interface*Activity | Adoption, mode="latent")
 c0 = contrast(e0, method="pairwise", ref=1) 
 test(c0, joint=TRUE, by="contrast")
 
-# We can also run this using the multinomial-Poisson trick. The
-# *.mp functions are defined in multpois.R and must each be loaded 
-# into memory first. We can also get our post hoc pairwise comparisons 
-# this way.
+# We can also run this using the multinomial-Poisson trick using multpois::glm.mp.
 m0 = glm.mp(Adoption ~ Interface * Activity, data=df)
 Anova.mp(m0, type=3)
 glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
@@ -217,10 +209,7 @@ View(df)
 # Unfortunately, there is no family=multinomial option for lme4::glmer, and 
 # nnet::multinom cannot model random factors, e.g., (1|PId).
 
-# Happily, we can run this using the multinomial-Poisson trick. The
-# *.mp functions are defined in multpois.R and must each be loaded 
-# into memory first. We can also get our post hoc pairwise comparisons 
-# this way.
+# Happily, we can run this using the multinomial-Poisson trick using multpois::glmer.mp.
 m = glmer.mp(Adoption ~ Interface*Activity + (1|PId), data=df)
 Anova.mp(m, type=3)
 glmer.mp.con(m, pairwise ~ Interface*Activity, adjust="holm")
