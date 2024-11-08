@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/01/2024
+### Last Updated: 11/07/2024
 ###
 
 ### BSD 2-Clause License
@@ -397,16 +397,16 @@ print(check_overdispersion(m))
 
 # check for overdispersion by condition
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "dollar" & df$Device == "mouse",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "rubine" & df$Device == "stylus",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "rubine" & df$Device == "mouse",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 # analysis of variance
 Anova(m, type=3)
@@ -537,16 +537,16 @@ print(check_overdispersion(m0))
 
 # check for overdispersion by condition
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "dollar" & df$Device == "mouse",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "rubine" & df$Device == "stylus",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "rubine" & df$Device == "mouse",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 # fit a quasi-Poisson model to address overdispersion
 m1 = glm(Errors ~ Recognizer * Device, data=df, family=quasipoisson)
@@ -625,16 +625,16 @@ print(check_overdispersion(m0))
 
 # check for overdispersion by condition
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "dollar" & df$Device == "mouse",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "rubine" & df$Device == "stylus",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 dv = df[df$Recognizer == "rubine" & df$Device == "mouse",]$Errors
-var(dv) / abs(mean(dv)) > 1.15
+abs(var(dv)/mean(dv)) > 1.15
 
 # fit a mixed negative binomial regression model
 m1 = glmer.nb(Errors ~ Recognizer*Device + (1|PId), data=df)
