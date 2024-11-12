@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -50,7 +50,7 @@ library(EnvStats) # for gofTest
 
 
 ##
-## 05b_factorial.csv
+#### 05b_factorial.csv ####
 ## two within-Ss. factors
 ##
 
@@ -110,7 +110,7 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 
 
 ##
-## 05c_factorial.csv
+#### 05c_factorial.csv ####
 ## two factors, one between-Ss. and one within-Ss.
 ## ("split-plot design")
 ##
@@ -174,7 +174,7 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 
 
 ##
-## 08a_lmm.csv
+#### 08a_lmm.csv ####
 ## nested random factor in a random factor
 ##
 
@@ -339,7 +339,7 @@ eta_squared(m, partial=TRUE)
 
 
 ##
-## 08b_lmm.csv
+#### 08b_lmm.csv ####
 ## nested random factor in a fixed factor
 ## 
 
@@ -453,7 +453,7 @@ emmeans(m, pairwise ~ Company, adjust="holm")
 
 
 ##
-## 08c_lmm.csv
+#### 08c_lmm.csv ####
 ## covariance structures
 ##
 
@@ -611,7 +611,7 @@ BIC(m.lmer) # 181.6737
 
 
 ##
-## Random intercept vs. random slope LMMs
+#### Random intercepts vs. random slopes ####
 ##
 
 ## Still using 08c_lmm.csv from above...

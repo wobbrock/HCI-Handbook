@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -48,7 +48,7 @@ library(effectsize) # for eta_squared
 
 
 ##
-## 04c_dependent_samples.csv
+#### 04c_dependent_samples.csv ####
 ## testing for order effects
 ##
 

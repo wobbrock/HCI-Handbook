@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -43,7 +43,7 @@ library(effectsize) # for cohens_d
 
 
 ##
-## 02_one_sample.csv
+#### 02_one_sample.csv ####
 ## continuous D.V. vs. hypothesized mu
 ##
 

@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -48,7 +48,7 @@ library(ARTool) # for art, art.con
 
 
 ##
-## 03a_independent_samples.csv
+#### 03a_independent_samples.csv ####
 ## two independent samples
 ##
 
@@ -113,7 +113,7 @@ wt = wilcox_test(Minutes ~ Engine, data=df)
 
 
 ##
-## 03b_independent_samples.csv
+#### 03b_independent_samples.csv ####
 ## three independent samples
 ##
 
@@ -196,7 +196,7 @@ wilcoxonZ(df[df$Engine == "Duck",]$Minutes, df[df$Engine == "Google",]$Minutes)
 
 
 ##
-## 04a_dependent_samples.csv
+#### 04a_dependent_samples.csv ####
 ## two dependent samples
 ##
 
@@ -265,7 +265,7 @@ wilcoxsign_test(Throughput ~ Mouse | PId, data=df)
 
 
 ##
-## 04b_dependent_samples.csv
+#### 04b_dependent_samples.csv ####
 ## three dependent samples
 ##
 
@@ -353,7 +353,7 @@ wilcoxonZ(df2$Microsoft, df2$Razer, paired=TRUE)
 
 
 ##
-## 05a_factorial.csv
+#### 05a_factorial.csv ####
 ## two between-Ss. factors
 ##
 
@@ -463,7 +463,7 @@ art.con(m, ~ Keyboard*Posture, adjust="holm")
 
 
 ##
-## 05b_factorial.csv
+#### 05b_factorial.csv ####
 ## two within-Ss. factors
 ##
 
@@ -500,7 +500,7 @@ art.con(m, ~ Keyboard*Posture, adjust="holm")
 
 
 ##
-## 05c_factorial.csv
+#### 05c_factorial.csv ####
 ## two factors, one between-Ss. and one within-Ss.
 ## ("split-plot design")
 ##

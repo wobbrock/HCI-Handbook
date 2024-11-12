@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -44,7 +44,7 @@ library(coin) # for symmetry_test, sign_test
 
 
 ##
-## 01a_categories.csv
+#### 01a_categories.csv ####
 ## one sample, two categories
 ##
 
@@ -94,7 +94,7 @@ G.test(xt)
 
 
 ##
-## 01b_categories.csv
+#### 01b_categories.csv ####
 ## one sample, three categories
 ##
 
@@ -149,7 +149,7 @@ p.adjust(c(0.004036, 0.5962, 0.02597), method="holm")
 
 
 ##
-## 01c_categories.csv
+#### 01c_categories.csv ####
 ## two samples
 ##
 
@@ -209,7 +209,7 @@ p.adjust(c(0.8238, 6.96e-05, 0.1742), method="holm")
 
 
 ##
-## 01d_categories.csv
+#### 01d_categories.csv ####
 ## dependent samples
 ##
 

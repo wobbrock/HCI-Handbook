@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -51,7 +51,7 @@ library(emmeans) # for emmeans
 
 
 ##
-## 02_one_sample.csv
+#### 02_one_sample.csv ####
 ## one-sample t-test
 ##
 
@@ -109,7 +109,7 @@ hdi(chains[,1])
 
 
 ##
-## 03a_independent_samples.csv
+#### 03a_independent_samples.csv ####
 ## independent-samples t-test
 ##
 
@@ -163,7 +163,7 @@ hdi(chains[,2])
 
 
 ##
-## 04a_dependent_samples.csv
+#### 04a_dependent_samples.csv ####
 ## paired-samples t-test
 ##
 
@@ -218,7 +218,7 @@ hdi(chains[,1])
 
 
 ##
-## 05a_factorial.csv
+#### 05a_factorial.csv ####
 ## two-way ANOVA
 ##
 
@@ -318,7 +318,7 @@ ttestBF(dv1, dv2)
 
 
 ##
-## 05b_factorial.csv
+#### 05b_factorial.csv ####
 ## linear mixed model
 ##
 

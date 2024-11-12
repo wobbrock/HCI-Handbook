@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -48,7 +48,7 @@ library(effectsize) # for cohens_d, eta_squared
 
 
 ##
-## 03a_independent_samples.csv
+#### 03a_independent_samples.csv ####
 ## two independent samples
 ##
 
@@ -142,7 +142,7 @@ cohens_d(Minutes ~ Engine, data=df)
 
 
 ##
-## 03b_independent_samples.csv
+#### 03b_independent_samples.csv ####
 ## three independent samples
 ##
 

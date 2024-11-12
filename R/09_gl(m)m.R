@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/07/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -55,7 +55,7 @@ library(EnvStats) # for gofTest
 
 
 ##
-## 09a_glm.csv
+#### 09a_glm.csv ####
 ## between-Ss. dichotomous D.V.
 ##   ..logistic regression
 ##
@@ -102,7 +102,7 @@ glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 
 
 ##
-## 09a_glmm.csv
+#### 09a_glmm.csv ####
 ## within-Ss. dichotomous D.V.
 ##   ..mixed logistic regression
 ##
@@ -135,7 +135,7 @@ glmer.mp.con(m0, pairwise ~ Interface * Activity, adjust="holm")
 
 
 ##
-## 09b_glm.csv
+#### 09b_glm.csv ####
 ## between-Ss. polytomous D.V.
 ##   ..multinomial logistic regression
 ##   ..via the multinomial-Poisson trick
@@ -183,7 +183,7 @@ glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 
 
 ##
-## 09b_glmm.csv
+#### 09b_glmm.csv ####
 ## within-Ss. polytomous D.V.
 ##   ..mixed multinomial logistic regression
 ##   ..via the multinomial-Poisson trick
@@ -214,7 +214,7 @@ glmer.mp.con(m, pairwise ~ Interface*Activity, adjust="holm")
 
 
 ##
-## 09c_glm.csv
+#### 09c_glm.csv ####
 ## between-Ss. ordinal D.V.
 ##   ..ordinal logistic regression
 ##
@@ -281,7 +281,7 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 
 
 ##
-## 09c_glmm.csv
+#### 09c_glmm.csv ####
 ## within-Ss. ordinal D.V.
 ##   ..mixed ordinal logistic regression
 ##
@@ -310,7 +310,7 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 
 
 ##
-## 09d_glm.csv
+#### 09d_glm.csv ####
 ## between-Ss. count D.V.
 ##   ..Poisson regression
 ##
@@ -417,7 +417,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
 
 ##
-## 09d_glmm.csv
+#### 09d_glmm.csv ####
 ## within-Ss. count D.V.
 ##   ..mixed Poisson regression
 ##
@@ -449,7 +449,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
 
 ##
-## 09e_glm.csv
+#### 09e_glm.csv ####
 ## between-Ss. overdispersed count D.V.
 ##   ..quasi-Poisson regression
 ##   ..negative binomial regression
@@ -548,7 +548,7 @@ abs(var(dv)/mean(dv)) > 1.15
 dv = df[df$Recognizer == "rubine" & df$Device == "mouse",]$Errors
 abs(var(dv)/mean(dv)) > 1.15
 
-# fit a quasi-Poisson model to address overdispersion
+# fit a quasi-Poisson model to address mild overdispersion
 m1 = glm(Errors ~ Recognizer * Device, data=df, family=quasipoisson)
 
 # compare analyses of variance
@@ -556,9 +556,11 @@ Anova(m0, type=3) # family=poisson
 Anova(m1, type=3) # family=quasipoisson
 
 # post hoc pairwise comparisons
-emmeans(m1, pairwise ~ Recognizer*Device, adjust="holm")
+emmeans(m0, pairwise ~ Recognizer*Device, adjust="holm") # family=poisson
+emmeans(m1, pairwise ~ Recognizer*Device, adjust="holm") # family=quasipoisson
 
-## now fit a negative binomial distribution to each condition
+
+### now fit a negative binomial distribution to each condition
 x = seq(floor(min(df$Errors)), ceiling(max(df$Errors)), by=1)
 
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
@@ -591,6 +593,7 @@ gofstat(f)
 
 # fit a negative binomial regression model
 m = glm.nb(Errors ~ Recognizer * Device, data=df)
+print(check_overdispersion(m))
 Anova(m, type=3)
 
 # post hoc pairwise comparisons
@@ -599,7 +602,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
 
 ##
-## 09e_glmm.csv
+#### 09e_glmm.csv ####
 ## within-Ss. overdispersed count D.V.
 ##   ..mixed negative binomial regression
 ##
@@ -638,18 +641,20 @@ abs(var(dv)/mean(dv)) > 1.15
 
 # fit a mixed negative binomial regression model
 m1 = glmer.nb(Errors ~ Recognizer*Device + (1|PId), data=df)
+print(check_overdispersion(m1))
 
 # compare analyses of variance
 Anova(m0, type=3) # Poisson
 Anova(m1, type=3) # negative binomial
 
 # post hoc pairwise comparisons
-emmeans(m1, pairwise ~ Recognizer*Device, adjust="holm")
+emmeans(m0, pairwise ~ Recognizer*Device, adjust="holm") # Poisson
+emmeans(m1, pairwise ~ Recognizer*Device, adjust="holm") # negative binomial
 
 
 
 ##
-## 09f_glm.csv
+#### 09f_glm.csv ####
 ## between-Ss. zero-inflated count D.V.
 ##   ..zero-inflated Poisson regression
 ##   ..zero-inflated negative binomial regression
@@ -739,7 +744,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a zero-inflated Poisson regression model
-m = glmmTMB(Errors ~ Recognizer * Device, data=df, family=poisson, ziformula=~.)
+m = glmmTMB(Errors ~ Recognizer * Device, data=df, family=poisson, ziformula=~1)
 
 # analysis of variance
 Anova(m, type=3)
@@ -747,7 +752,8 @@ Anova(m, type=3)
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
-## now fit a negative binomial distribution to each condition
+
+### now fit a negative binomial distribution to each condition
 x = seq(floor(min(df$Errors)), ceiling(max(df$Errors)), by=1)
 
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
@@ -788,7 +794,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a zero-inflated negative binomial regression model
-m = glmmTMB(Errors ~ Recognizer * Device, data=df, family=nbinom2, ziformula=~.)
+m = glmmTMB(Errors ~ Recognizer * Device, data=df, family=nbinom2, ziformula=~1)
 
 # analysis of variance
 Anova(m, type=3)
@@ -799,7 +805,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
 
 ##
-## 09f_glmm.csv
+#### 09f_glmm.csv ####
 ## within-Ss. zero-inflated count D.V.
 ##   ..mixed zero-inflated Poisson regression
 ##   ..mixed zero-inflated negative binomial regression
@@ -827,7 +833,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a mixed zero-inflated Poisson regression model
-m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson, ziformula=~.)
+m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson, REML=TRUE, ziformula=~1)
 
 # analysis of variance
 Anova(m, type=3)
@@ -835,7 +841,8 @@ Anova(m, type=3)
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
-## now fit a regular mixed negative binomial regression model
+
+### now fit a regular mixed negative binomial regression model
 m0 = glmer.nb(Errors ~ Recognizer*Device + (1|PId), data=df)
 
 # check for overdispersion
@@ -845,7 +852,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a mixed zero-inflated negative binomial regression model
-m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=nbinom2, ziformula=~.)
+m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=nbinom2, REML=TRUE, ziformula=~1)
 
 # analysis of variance
 Anova(m, type=3)
@@ -856,7 +863,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 
 
 ##
-## 06_lognormal.csv
+#### 06_lognormal.csv ####
 ## between-Ss. time-based D.V.
 ##   ..gamma regression
 ##
@@ -911,7 +918,7 @@ emmeans(m, pairwise ~ IDE, adjust="holm")
 
 
 ##
-## 09g_glmm.csv
+#### 09g_glmm.csv ####
 ## within-Ss. time-based D.V.
 ##   ..mixed Gamma regression
 ##

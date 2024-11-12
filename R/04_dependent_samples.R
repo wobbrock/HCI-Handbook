@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -48,7 +48,7 @@ library(effectsize) # for cohens_d
 
 
 ##
-## 04a_dependent_samples.csv
+#### 04a_dependent_samples.csv ####
 ## two dependent samples
 ##
 
@@ -138,7 +138,7 @@ cohens_d(df2$Logitech, df2$Microsoft, paired=TRUE)
 
 
 ##
-## 04b_dependent_samples.csv
+#### 04b_dependent_samples.csv ####
 ## three dependent samples
 ##
 

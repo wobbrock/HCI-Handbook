@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 10/05/2024
+### Last Updated: 11/11/2024
 ###
 
 ### BSD 2-Clause License
@@ -46,7 +46,7 @@ library(effectsize) # for cohens_d
 
 
 ##
-## 06_lognormal.csv
+#### 06_lognormal.csv ####
 ## log-transform of the D.V.
 ##
 
