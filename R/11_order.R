@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -53,7 +53,7 @@ library(effectsize) # for eta_squared
 ##
 
 # prepare data table
-df <- read.csv("04c_dependent_samples.csv")
+df <- read.csv(".\\data\\04c_dependent_samples.csv")
 df$PId = factor(df$PId)
 df$Mouse = factor(df$Mouse)
 df$Order = factor(df$Order)
@@ -127,7 +127,7 @@ shapiro.test(df$Residuals)
 m = lmer(Throughput ~ Order + (1|PId), data=df)
 r = residuals(m) # extract residuals
 
-hist(r, xlim=c(-2,+2), ylim=c(0,14), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
+hist(r, xlim=c(-2,+2), ylim=c(0,14.5), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.6), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
@@ -151,7 +151,7 @@ emmeans(m, pairwise ~ Order, adjust="holm")
 m = lmer(Throughput ~ Mouse*Order + (1|PId), data=df)
 r = residuals(m) # extract residuals
 
-hist(r, xlim=c(-1.5,+1.5), ylim=c(0,18), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
+hist(r, xlim=c(-1.5,+1.5), ylim=c(0,19), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
 hist(r, xlim=c(-1.5,+1.5), ylim=c(0,0.8), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve

@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -41,9 +41,15 @@ library(plyr) # for ddply
 library(effectsize) # for cohens_d
 library(afex) # for aov_ez
 library(emmeans) # for emmeans
-library(coin) # for median_test, wilcox_test, kruskal_test, sign_test, wilcoxsign_test, friedman_test
+library(coin) # for median_test, 
+              #     wilcox_test, 
+              #     kruskal_test, 
+              #     sign_test, 
+              #     wilcoxsign_test, 
+              #     friedman_test
 library(rcompanion) # for wilcoxonZ
 library(reshape2) # for dcast
+library(performance) # for check_sphericity
 library(ARTool) # for art, art.con
 
 
@@ -53,7 +59,7 @@ library(ARTool) # for art, art.con
 ##
 
 # prepare data table
-df <- read.csv("03a_independent_samples.csv")
+df <- read.csv(".\\data\\03a_independent_samples.csv")
 df$PId = factor(df$PId)
 df$Engine = factor(df$Engine)
 contrasts(df$Engine) <- "contr.sum"
@@ -108,7 +114,7 @@ cohens_d(Minutes ~ Engine, data=df)
 median_test(Minutes ~ Engine, data=df)
 
 # Mann-Whitney U test
-wt = wilcox_test(Minutes ~ Engine, data=df)
+wilcox_test(Minutes ~ Engine, data=df)
 
 
 
@@ -118,7 +124,7 @@ wt = wilcox_test(Minutes ~ Engine, data=df)
 ##
 
 # prepare data table
-df <- read.csv("03b_independent_samples.csv")
+df <- read.csv(".\\data\\03b_independent_samples.csv")
 df$PId = factor(df$PId)
 df$Engine = factor(df$Engine)
 contrasts(df$Engine) <- "contr.sum"
@@ -201,7 +207,7 @@ wilcoxonZ(df[df$Engine == "Duck",]$Minutes, df[df$Engine == "Google",]$Minutes)
 ##
 
 # prepare data table
-df <- read.csv("04a_dependent_samples.csv")
+df <- read.csv(".\\data\\04a_dependent_samples.csv")
 df$PId = factor(df$PId)
 df$Mouse = factor(df$Mouse)
 contrasts(df$Mouse) <- "contr.sum"
@@ -270,7 +276,7 @@ wilcoxsign_test(Throughput ~ Mouse | PId, data=df)
 ##
 
 # prepare data table
-df <- read.csv("04b_dependent_samples.csv")
+df <- read.csv(".\\data\\04b_dependent_samples.csv")
 df$PId = factor(df$PId)
 df$Mouse = factor(df$Mouse)
 contrasts(df$Mouse) <- "contr.sum"
@@ -358,7 +364,7 @@ wilcoxonZ(df2$Microsoft, df2$Razer, paired=TRUE)
 ##
 
 # prepare data table
-df <- read.csv("05a_factorial.csv")
+df <- read.csv(".\\data\\05a_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -468,7 +474,7 @@ art.con(m, ~ Keyboard*Posture, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("05b_factorial.csv")
+df <- read.csv(".\\data\\05b_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -491,7 +497,7 @@ anova(m0, correction="none")
 emmeans(m0, pairwise ~ Keyboard*Posture, adjust="holm")
 
 # ART
-m = art(WPM ~ Keyboard * Posture + (1|PId), data=df)
+m = art(WPM ~ Keyboard*Posture + (1|PId), data=df)
 anova(m)
 
 # ART-C post hoc pairwise comparisons
@@ -506,7 +512,7 @@ art.con(m, ~ Keyboard*Posture, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("05c_factorial.csv")
+df <- read.csv(".\\data\\05c_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -529,7 +535,7 @@ anova(m0, correction="none")
 emmeans(m0, pairwise ~ Keyboard*Posture, adjust="holm")
 
 # ART
-m = art(WPM ~ Keyboard * Posture + (1|PId), data=df)
+m = art(WPM ~ Keyboard*Posture + (1|PId), data=df)
 anova(m)
 
 # ART-C post hoc pairwise comparisons

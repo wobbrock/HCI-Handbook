@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -37,7 +37,7 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply
+library(plyr) # for ddply, l_ply
 library(lme4) # for lmer
 library(lmerTest) # for lmer
 library(nlme) # for lme
@@ -55,7 +55,7 @@ library(EnvStats) # for gofTest
 ##
 
 # prepare data table
-df <- read.csv("05b_factorial.csv")
+df <- read.csv(".\\data\\05b_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -89,7 +89,7 @@ anova(m0, correction="none")
 emmeans(m0, pairwise ~ Keyboard*Posture, adjust="holm")
 
 # linear mixed model (LMM)
-m = lmer(WPM ~ Keyboard * Posture + (1|PId), data=df)
+m = lmer(WPM ~ Keyboard*Posture + (1|PId), data=df)
 
 # normality
 r = residuals(m)
@@ -116,7 +116,7 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("05c_factorial.csv")
+df <- read.csv(".\\data\\05c_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -150,7 +150,7 @@ anova(m0, correction="none")
 emmeans(m0, pairwise ~ Keyboard*Posture, adjust="holm")
 
 # linear mixed model (LMM)
-m = lmer(WPM ~ Keyboard * Posture + (1|PId), data=df)
+m = lmer(WPM ~ Keyboard*Posture + (1|PId), data=df)
 
 # normality
 r = residuals(m)
@@ -179,7 +179,7 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("08a_lmm.csv")
+df <- read.csv(".\\data\\08a_lmm.csv")
 df$PId = factor(df$PId)
 df$University = factor(df$University)
 df$IDE = factor(df$IDE)
@@ -344,7 +344,7 @@ eta_squared(m, partial=TRUE)
 ## 
 
 # prepare data table
-df <- read.csv("08b_lmm.csv")
+df <- read.csv(".\\data\\08b_lmm.csv")
 df$PId = factor(df$PId)
 df$Company = factor(df$Company)
 df$UI = factor(df$UI)
@@ -373,22 +373,22 @@ boxplot(Problems ~ Company,
         col=c("tan1","lightgray","pink","lightgreen","lightblue","lightyellow"),
         data=df)
 
-# make six stacked histograms
-par(mfrow=c(6,1))
+# make 3x2 stacked histograms
+par(mfrow=c(3,2))
   hist(df[df$Company == "Amazon",]$Problems, 
-     main="Amazon Problems", 
-     xlab="Problems",
-     ylab="Count",
-     xlim=c(0,20),
-     ylim=c(0,3),
-     breaks=seq(0,20,2),
-     col="tan1")
+       main="Amazon Problems", 
+       xlab="Problems",
+       ylab="Count",
+       xlim=c(0,20),
+       ylim=c(0,12),
+       breaks=seq(0,20,2),
+       col="tan1")
   hist(df[df$Company == "Apple",]$Problems, 
        main="Apple Problems", 
        xlab="Problems",
        ylab="Count",
        xlim=c(0,20),
-       ylim=c(0,3),
+       ylim=c(0,12),
        breaks=seq(0,20,2),
        col="lightgray")
   hist(df[df$Company == "Baidu",]$Problems, 
@@ -396,7 +396,7 @@ par(mfrow=c(6,1))
        xlab="Problems",
        ylab="Count",
        xlim=c(0,20),
-       ylim=c(0,3),
+       ylim=c(0,12),
        breaks=seq(0,20,2),
        col="pink")
   hist(df[df$Company == "Google",]$Problems, 
@@ -404,7 +404,7 @@ par(mfrow=c(6,1))
        xlab="Problems",
        ylab="Count",
        xlim=c(0,20),
-       ylim=c(0,3),
+       ylim=c(0,12),
        breaks=seq(0,20,2),
        col="lightgreen")
   hist(df[df$Company == "Meta",]$Problems, 
@@ -412,7 +412,7 @@ par(mfrow=c(6,1))
        xlab="Problems",
        ylab="Count",
        xlim=c(0,20),
-       ylim=c(0,3),
+       ylim=c(0,12),
        breaks=seq(0,20,2),
        col="lightblue")
   hist(df[df$Company == "Microsoft",]$Problems, 
@@ -420,13 +420,13 @@ par(mfrow=c(6,1))
        xlab="Problems",
        ylab="Count",
        xlim=c(0,20),
-       ylim=c(0,3),
+       ylim=c(0,12),
        breaks=seq(0,20,2),
        col="lightyellow")
 par(mfrow=c(1,1))
 
 # these would be incorrect LMM formulations
-m0 = lmer(Problems ~ Company + (1|Company/PId) + (1|UI), data=df)  # nope!
+m0 = lmer(Problems ~ Company + (1|Company/PId) + (1|UI), data=df)  # wrong!
 m1 = lmer(Problems ~ Company + (1|Company) + (1|Company:PId) + (1|UI), data=df)  # no, same!
 
 # this is the correct LMM formulation
@@ -458,7 +458,7 @@ emmeans(m, pairwise ~ Company, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("08c_lmm.csv")
+df <- read.csv(".\\data\\08c_lmm.csv")
 df$PId = factor(df$PId)
 df$Week = factor(df$Week)
 contrasts(df$Week) <- "contr.sum"
@@ -502,21 +502,26 @@ arrows(x0=2, y0=msd[2,]$Mean - msd[2,]$SD, x1=2, y1=msd[2,]$Mean + msd[2,]$SD, a
 arrows(x0=3, y0=msd[3,]$Mean - msd[3,]$SD, x1=3, y1=msd[3,]$Mean + msd[3,]$SD, angle=90, code=3, lty=1, lwd=3, length=0.2, col="blue")
 
 # manually calculate variances and covariances
-var(df[df$Week == 1,]$Hours)
-var(df[df$Week == 2,]$Hours)
-var(df[df$Week == 3,]$Hours)
+var(df[df$Week == 1,]$Hours) # 25.93762
+var(df[df$Week == 2,]$Hours) # 18.01613
+var(df[df$Week == 3,]$Hours) # 35.21805
 
-cov(df[df$Week == 1,]$Hours, df[df$Week == 2,]$Hours)
-cov(df[df$Week == 1,]$Hours, df[df$Week == 3,]$Hours)
-cov(df[df$Week == 2,]$Hours, df[df$Week == 3,]$Hours)
+cov(df[df$Week == 1,]$Hours, df[df$Week == 2,]$Hours) # 12.98577
+cov(df[df$Week == 1,]$Hours, df[df$Week == 3,]$Hours) # 14.9071
+cov(df[df$Week == 2,]$Hours, df[df$Week == 3,]$Hours) # 19.68331
 
 # first fit an LMM with unstructured (UN) covariance matrix
-m = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corSymm(form=~1|PId), weights=varIdent(form=~1|Week))
+m = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corSymm(form=~1|PId), weights=varIdent(form=~1|Week)) #UN
 getVarCov(m, type="marginal")
+# Marginal variance covariance matrix
+#        1      2      3
+# 1 25.938 12.986 14.907
+# 2 12.986 18.016 19.683
+# 3 14.907 19.683 35.218
 
 # analysis of variance
-anova(m, type="marginal") # F(2,18)=4.68812, p=0.023
-eta_squared(m, partial=TRUE) # partial eta^2 = 0.34
+anova(m, type="marginal")    # F(2,18) = 4.69, p=0.023
+eta_squared(m, partial=TRUE) # 0.34
 emmeans(m, pairwise ~ Week, adjust="holm")
 BIC(m) # 193.5247
 
@@ -524,87 +529,87 @@ BIC(m) # 193.5247
 #  1. Scaled Identity (ID)
 m.ID = lme(Hours ~ Week, random=~1|PId, data=df) #ID
 getVarCov(m.ID, type="marginal")
-anova(m.ID, type="marginal") # F(2,18)=7.02864, p=0.0055
-eta_squared(m.ID, partial=TRUE) # partial eta^2 = 0.44
+anova(m.ID, type="marginal")    # F(2,18) = 7.03, p = .006
+eta_squared(m.ID, partial=TRUE) # 0.44
 emmeans(m.ID, pairwise ~ Week, adjust="holm")
 BIC(m.ID) # 181.1469
 
 #  2. Diagonal (DIAG)
 m.DIAG = lme(Hours ~ Week, random=~1|PId, data=df, weights=varIdent(form=~1|Week)) #DIAG
 getVarCov(m.DIAG, type="marginal")
-anova(m.DIAG, type="marginal") # F(2,18)=4.90223, p=0.02
-eta_squared(m.DIAG, partial=TRUE) # partial eta^2 = 0.35
+anova(m.DIAG, type="marginal")    # F(2,18) = 4.90, p = .020
+eta_squared(m.DIAG, partial=TRUE) # 0.35
 emmeans(m.DIAG, pairwise ~ Week, adjust="holm")
 BIC(m.DIAG) # 184.4128
 
 #  3. Compound Symmetry (CS)
 m.CS = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corCompSymm(form=~1|PId)) #CS
 getVarCov(m.CS, type="marginal")
-anova(m.CS, type="marginal") # F(2,18)=7.02864, p=0.0055
-eta_squared(m.CS, partial=TRUE) # partial eta^2 = 0.44
+anova(m.CS, type="marginal")    # F(2,18) = 7.03, p = .006
+eta_squared(m.CS, partial=TRUE) # 0.44
 emmeans(m.CS, pairwise ~ Week, adjust="holm")
 BIC(m.CS) # 184.4427
 
 #  4. Heterogeneous Compound Symmetry (CSH)
 m.CSH = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corCompSymm(form=~1|PId), weights=varIdent(form=~1|Week)) #CSH
 getVarCov(m.CSH, type="marginal")
-anova(m.CSH, type="marginal") # F(2,18)=4.69811, p=0.0228
-eta_squared(m.CSH, partial=TRUE) # partial eta^2 = 0.34
+anova(m.CSH, type="marginal")    # F(2,18) = 4.70, p = .023
+eta_squared(m.CSH, partial=TRUE) # 0.34
 emmeans(m.CSH, pairwise ~ Week, adjust="holm")
 BIC(m.CSH) # 187.6678
 
 #  5. First-order autoregressive (AR1)
 m.AR1 = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corAR1(form=~1|PId)) #AR1
 getVarCov(m.AR1, type="marginal")
-anova(m.AR1, type="marginal") # F(2,18)=5.63152, p=0.0126
-eta_squared(m.AR1, partial=TRUE) # partial eta^2 = 0.38
+anova(m.AR1, type="marginal")    # F(2,18) = 5.63, p = .013
+eta_squared(m.AR1, partial=TRUE) # 0.38
 emmeans(m.AR1, pairwise ~ Week, adjust="holm")
 BIC(m.AR1) # 182.9592
 
 #  6. Heterogeneous first-order autoregressive (ARH1)
 m.ARH1 = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corAR1(form=~1|PId), weights=varIdent(form=~1|Week)) #ARH1
 getVarCov(m.ARH1, type="marginal")
-anova(m.ARH1, type="marginal") # F(2,18)=4.87592, p=0.0203
-eta_squared(m.ARH1, partial=TRUE) # partial eta^2 = 0.35
+anova(m.ARH1, type="marginal")    # F(2,18) = 4.88, p = .020
+eta_squared(m.ARH1, partial=TRUE) # 0.35
 emmeans(m.ARH1, pairwise ~ Week, adjust="holm")
 BIC(m.ARH1) # 187.705
 
 #  7. Autoregressive moving average (ARMA11)
 m.ARMA11 = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corARMA(form=~1|PId, p=1, q=1)) #ARMA11
 getVarCov(m.ARMA11, type="marginal")
-anova(m.ARMA11, type="marginal") # F(2,18)=5.63151, p=0.0126
-eta_squared(m.ARMA11, partial=TRUE) # partial eta^2 = 0.38
+anova(m.ARMA11, type="marginal")    # F(2,18) = 5.63, p = .013
+eta_squared(m.ARMA11, partial=TRUE) # 0.38
 emmeans(m.ARMA11, pairwise ~ Week, adjust="holm")
 BIC(m.ARMA11) # 186.2551
 
 #  8. Toeplitz (TP)
 m.TP = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corARMA(form=~1|PId, p=2, q=0)) #TP
 getVarCov(m.TP, type="marginal")
-anova(m.TP, type="marginal") # F(2,18)=5.63152, p=0.0126
-eta_squared(m.TP, partial=TRUE) # partial eta^2 = 0.38
+anova(m.TP, type="marginal")    # F(2,18) = 5.63, p= .013
+eta_squared(m.TP, partial=TRUE) # 0.38
 emmeans(m.TP, pairwise ~ Week, adjust="holm")
 BIC(m.TP) # 186.2551
 
 #  9. Heterogeneous Toeplitz (TPH)
 m.TPH = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corARMA(form=~1|PId, p=2, q=0), weights=varIdent(form=~1|Week), control=lmeControl(opt="optim")) #TPH
 getVarCov(m.TPH, type="marginal")
-anova(m.TPH, type="marginal") # F(2,18)=4.71803, p=0.0225
-eta_squared(m.TPH, partial=TRUE) # partial eta^2 = 0.34
+anova(m.TPH, type="marginal")    # F(2,18) = 4.72, p = .023
+eta_squared(m.TPH, partial=TRUE) # 0.34
 emmeans(m.TPH, pairwise ~ Week, adjust="holm")
 BIC(m.TPH) # 190.9491
 
 #  10. Unstructured (UN)
 m.UN = lme(Hours ~ Week, random=~1|PId, data=df, correlation=corSymm(form=~1|PId), weights=varIdent(form=~1|Week)) #UN
 getVarCov(m.UN, type="marginal")
-anova(m.UN, type="marginal") # F(2,18)=4.68812, p=0.023
-eta_squared(m.UN, partial=TRUE) # partial eta^2 = 0.34
+anova(m.UN, type="marginal")    # F(2,18) = 4.69, p = .023
+eta_squared(m.UN, partial=TRUE) # 0.34
 emmeans(m.UN, pairwise ~ Week, adjust="holm")
 BIC(m.UN) # 193.5247
 
 # compare to lme4::lmer
 m.lmer = lmer(Hours ~ Week + (1|PId), data=df)
-Anova(m.lmer, type=3, test.statistic="F") # F(2,18)=7.0286, p=0.005548
-eta_squared(m.lmer, partial=TRUE) # partial eta^2 = 0.44
+Anova(m.lmer, type=3, test.statistic="F") # F(2,18) = 7.03, p = .006
+eta_squared(m.lmer, partial=TRUE)         # 0.44
 emmeans(m.lmer, pairwise ~ Week, adjust="holm")
 BIC(m.lmer) # 181.6737
 
@@ -655,8 +660,8 @@ BIC(m.int) # 180.0016
 BIC(m.slp) # 183.5065
 
 # analyses of variance
-Anova(m.int, type=3, test.statistic="F") # F(1,19)=14.3570, p=0.00124
-Anova(m.slp, type=3, test.statistic="F") # F(1,9)=9.2730, p=0.01390
+Anova(m.int, type=3, test.statistic="F") # F(1,19) = 14.36, p = .001
+Anova(m.slp, type=3, test.statistic="F") # F(1,9) = 9.27, p = .014
 
 # plot the resulting models
 par(mfrow=c(1,2))

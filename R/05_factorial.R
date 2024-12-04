@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -43,6 +43,7 @@ library(EnvStats) # for gofTest
 library(car) # for leveneTest, Anova
 library(afex) # for for aov_ez
 library(performance) # for check_homogeneity, check_sphericity
+library(effectsize) # for eta_squared
 library(emmeans) # for emmeans
 
 
@@ -52,7 +53,7 @@ library(emmeans) # for emmeans
 ##
 
 # prepare data table
-df <- read.csv("05a_factorial.csv")
+df <- read.csv(".\\data\\05a_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -187,6 +188,7 @@ anova(m)
 
 # if Levene's test had shown heteroscedasticity (p<.05), use a White-adjusted ANOVA
 Anova(m$lm, type=3, white.adjust=TRUE)
+eta_squared(m, generalized=TRUE)
 
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
@@ -199,7 +201,7 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("05b_factorial.csv")
+df <- read.csv(".\\data\\05b_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -234,7 +236,7 @@ summary(m)                  # Mauchly's test for sphericity
 print(check_sphericity(m))  # Mauchly's test for sphericity
 
 # two-way repeated measures ANOVA
-anova(m, correction="none") # use if p>.05, no violation of sphericity
+anova(m, correction="none") # use if p≥.05, no violation of sphericity
 anova(m, correction="GG")   # use if p<.05, sphericity violation
 
 # post hoc pairwise comparisons
@@ -249,7 +251,7 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("05c_factorial.csv")
+df <- read.csv(".\\data\\05c_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -287,7 +289,7 @@ summary(m)                  # Mauchly's test for sphericity
 print(check_sphericity(m))  # Mauchly's test for sphericity
 
 # two-way mixed factorial ANOVA
-anova(m, correction="none") # use if p>.05, no violation of sphericity
+anova(m, correction="none") # use if p≥.05, no violation of sphericity
 anova(m, correction="GG")   # use if p<.05, sphericity violation
 
 # post hoc pairwise comparisons

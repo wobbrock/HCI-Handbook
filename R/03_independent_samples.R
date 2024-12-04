@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -53,7 +53,7 @@ library(effectsize) # for cohens_d, eta_squared
 ##
 
 # prepare data table
-df <- read.csv("03a_independent_samples.csv")
+df <- read.csv(".\\data\\03a_independent_samples.csv")
 df$PId = factor(df$PId)
 df$Engine = factor(df$Engine)
 contrasts(df$Engine) <- "contr.sum"
@@ -147,7 +147,7 @@ cohens_d(Minutes ~ Engine, data=df)
 ##
 
 # prepare data table
-df <- read.csv("03b_independent_samples.csv")
+df <- read.csv(".\\data\\03b_independent_samples.csv")
 df$PId = factor(df$PId)
 df$Engine = factor(df$Engine)
 contrasts(df$Engine) <- "contr.sum"

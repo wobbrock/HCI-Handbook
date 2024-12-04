@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -53,7 +53,7 @@ library(effectsize) # for cohens_d
 ##
 
 # prepare data table
-df <- read.csv("04a_dependent_samples.csv")
+df <- read.csv(".\\data\\04a_dependent_samples.csv")
 df$PId = factor(df$PId)
 df$Mouse = factor(df$Mouse)
 contrasts(df$Mouse) <- "contr.sum"
@@ -143,7 +143,7 @@ cohens_d(df2$Logitech, df2$Microsoft, paired=TRUE)
 ##
 
 # prepare data table
-df <- read.csv("04b_dependent_samples.csv")
+df <- read.csv(".\\data\\04b_dependent_samples.csv")
 df$PId = factor(df$PId)
 df$Mouse = factor(df$Mouse)
 contrasts(df$Mouse) <- "contr.sum"
@@ -235,7 +235,7 @@ summary(m)                  # Mauchly's test for sphericity
 print(check_sphericity(m))  # Mauchly's test for sphericity
 
 # one-way repeated measures ANOVA
-anova(m, correction="none") # use if p>.05, no violation of sphericity
+anova(m, correction="none") # use if p≥.05, no violation of sphericity
 anova(m, correction="GG")   # use if p<.05, sphericity violation
 
 # post hoc pairwise comparisons

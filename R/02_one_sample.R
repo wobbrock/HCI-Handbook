@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -48,7 +48,7 @@ library(effectsize) # for cohens_d
 ##
 
 # prepare data table
-df <- read.csv("02_one_sample.csv")
+df <- read.csv(".\\data\\02_one_sample.csv")
 df$PId = factor(df$PId)
 View(df)
 

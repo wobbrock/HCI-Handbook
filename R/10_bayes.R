@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -56,7 +56,7 @@ library(emmeans) # for emmeans
 ##
 
 # prepare data table
-df <- read.csv("02_one_sample.csv")
+df <- read.csv(".\\data\\02_one_sample.csv")
 df$PId = factor(df$PId)
 View(df)
 
@@ -114,7 +114,7 @@ hdi(chains[,1])
 ##
 
 # prepare data table
-df <- read.csv("03a_independent_samples.csv")
+df <- read.csv(".\\data\\03a_independent_samples.csv")
 df$PId = factor(df$PId)
 df$Engine = factor(df$Engine)
 contrasts(df$Engine) <- "contr.sum"
@@ -168,7 +168,7 @@ hdi(chains[,2])
 ##
 
 # prepare data table
-df <- read.csv("04a_dependent_samples.csv")
+df <- read.csv(".\\data\\04a_dependent_samples.csv")
 df$PId = factor(df$PId)
 df$Mouse = factor(df$Mouse)
 contrasts(df$Mouse) <- "contr.sum"
@@ -223,7 +223,7 @@ hdi(chains[,1])
 ##
 
 # prepare data table
-df <- read.csv("05a_factorial.csv")
+df <- read.csv(".\\data\\05a_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -269,7 +269,7 @@ arrows(x0=2+dx, y0=msd[4,]$Mean - msd[4,]$SD, x1=2+dx, y1=msd[4,]$Mean + msd[4,]
 
 # build an ANOVA model and test normality and homoscedasticity
 m = aov_ez(dv="WPM", between=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m)) # Shapiro-Wilk test
+print(check_normality(m))   # Shapiro-Wilk test
 print(check_homogeneity(m)) # Levene's test
 
 # two-way ANOVA
@@ -323,7 +323,7 @@ ttestBF(dv1, dv2)
 ##
 
 # prepare data table
-df <- read.csv("05b_factorial.csv")
+df <- read.csv(".\\data\\05b_factorial.csv")
 df$PId = factor(df$PId)
 df$Keyboard = factor(df$Keyboard)
 df$Posture = factor(df$Posture)
@@ -335,7 +335,7 @@ View(df)
 # subjects; therefore, we skip the descriptive statistics and visualizations.
 
 # linear mixed model (LMM)
-m = lmer(WPM ~ Keyboard * Posture + (1|PId), data=df)
+m = lmer(WPM ~ Keyboard*Posture + (1|PId), data=df)
 print(check_normality(m)) # Shapiro-Wilk
 # no sphericity assumption for LMMs!
 

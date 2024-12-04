@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -61,7 +61,7 @@ library(EnvStats) # for gofTest
 ##
 
 # prepare data table
-df <- read.csv("09a_glm.csv")
+df <- read.csv(".\\data\\09a_glm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
@@ -108,7 +108,7 @@ glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09a_glmm.csv")
+df <- read.csv(".\\data\\09a_glmm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
@@ -142,7 +142,7 @@ glmer.mp.con(m0, pairwise ~ Interface * Activity, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09b_glm.csv")
+df <- read.csv(".\\data\\09b_glm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
@@ -190,7 +190,7 @@ glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09b_glmm.csv")
+df <- read.csv(".\\data\\09b_glmm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
@@ -220,7 +220,7 @@ glmer.mp.con(m, pairwise ~ Interface*Activity, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09c_glm.csv")
+df <- read.csv(".\\data\\09c_glm.csv")
 df$PId = factor(df$PId)
 df$Technique = factor(df$Technique)
 df$Hands = factor(df$Hands)
@@ -287,7 +287,7 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09c_glmm.csv")
+df <- read.csv(".\\data\\09c_glmm.csv")
 df$PId = factor(df$PId)
 df$Technique = factor(df$Technique)
 df$Hands = factor(df$Hands)
@@ -316,7 +316,7 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09d_glm.csv")
+df <- read.csv(".\\data\\09d_glm.csv")
 df$PId = factor(df$PId)
 df$Recognizer = factor(df$Recognizer)
 df$Device = factor(df$Device)
@@ -423,7 +423,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09d_glmm.csv")
+df <- read.csv(".\\data\\09d_glmm.csv")
 df$PId = factor(df$PId)
 df$Recognizer = factor(df$Recognizer)
 df$Device = factor(df$Device)
@@ -456,7 +456,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09e_glm.csv")
+df <- read.csv(".\\data\\09e_glm.csv")
 df$PId = factor(df$PId)
 df$Recognizer = factor(df$Recognizer)
 df$Device = factor(df$Device)
@@ -608,7 +608,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09e_glmm.csv")
+df <- read.csv(".\\data\\09e_glmm.csv")
 df$PId = factor(df$PId)
 df$Recognizer = factor(df$Recognizer)
 df$Device = factor(df$Device)
@@ -661,7 +661,7 @@ emmeans(m1, pairwise ~ Recognizer*Device, adjust="holm") # negative binomial
 ##
 
 # prepare data table
-df <- read.csv("09f_glm.csv")
+df <- read.csv(".\\data\\09f_glm.csv")
 df$PId = factor(df$PId)
 df$Recognizer = factor(df$Recognizer)
 df$Device = factor(df$Device)
@@ -812,7 +812,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09f_glmm.csv")
+df <- read.csv(".\\data\\09f_glmm.csv")
 df$PId = factor(df$PId)
 df$Recognizer = factor(df$Recognizer)
 df$Device = factor(df$Device)
@@ -869,7 +869,7 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("06_lognormal.csv")
+df <- read.csv(".\\data\\06_lognormal.csv")
 df$PId = factor(df$PId)
 df$IDE = factor(df$IDE)
 contrasts(df$IDE) <- "contr.sum"
@@ -924,7 +924,7 @@ emmeans(m, pairwise ~ IDE, adjust="holm")
 ##
 
 # prepare data table
-df <- read.csv("09g_glmm.csv")
+df <- read.csv(".\\data\\09g_glmm.csv")
 df$PId = factor(df$PId)
 df$IDE = factor(df$IDE)
 contrasts(df$IDE) <- "contr.sum"

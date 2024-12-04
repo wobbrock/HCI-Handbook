@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 11/11/2024
+### Last Updated: 12/03/2024
 ###
 
 ### BSD 2-Clause License
@@ -51,7 +51,7 @@ library(effectsize) # for cohens_d
 ##
 
 # prepare data table
-df <- read.csv("06_lognormal.csv")
+df <- read.csv(".\\data\\06_lognormal.csv")
 df$PId = factor(df$PId)
 df$IDE = factor(df$IDE)
 contrasts(df$IDE) <- "contr.sum"
