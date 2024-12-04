@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 12/04/2024
 ###
 
 ### BSD 2-Clause License
@@ -669,14 +669,14 @@ par(mfrow=c(1,2))
   fe = fixef(m.int)      # fixed effects model
   re = ranef(m.int)$PId  # random intercepts
   plot(Hours ~ Week, data=df, main="Random Intercept Model", xlab="Week", pch=16, cex=1.3, col=colors[as.numeric(PId)])
-  l_ply(seq_len(nrow(re)), \(x) abline(fe[1] + re[x,1], fe[2], col=colors[x]))
+  l_ply(seq_len(nrow(re)), \(x) abline(fe[1] + re[x,1], fe[2], lwd=2, col=colors[x]))
   abline(fe[1], fe[2], lwd=5, col="black")
 
   # random slopes
   fe = fixef(m.slp)     # fixed effects model
   re = ranef(m.slp)$PId # random intercepts and slopes
   plot(Hours ~ Week, data=df, main="Random Slope Model", xlab="Week", pch=16, cex=1.3, col=colors[as.numeric(PId)])
-  l_ply(seq_len(nrow(re)), \(x) abline(fe[1] + re[x,1], fe[2] + re[x,2], col=colors[x]))
+  l_ply(seq_len(nrow(re)), \(x) abline(fe[1] + re[x,1], fe[2] + re[x,2], lwd=2, col=colors[x]))
   abline(fe[1], fe[2], lwd=5, col="black")
 par(mfrow=c(1,1))
 
