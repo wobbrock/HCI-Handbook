@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 12/06/2024
 ###
 
 ### BSD 2-Clause License
@@ -888,7 +888,7 @@ curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.param
 print(f) # Shapiro-Wilk: p = .471
 
 dv = df[df$IDE == "VStudio",]$Hours
-hist(dv, main="Visual Studio Hours", xlab="Hours", freq=FALSE)
+hist(dv, main="Microsoft Visual Studio Hours", xlab="Hours", freq=FALSE)
 
 f = gofTest(dv, distribution="gamma")
 curve(dgamma(x, shape=f$distribution.parameters[1], scale=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # Gamma curve
