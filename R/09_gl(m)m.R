@@ -38,7 +38,6 @@
 
 
 library(plyr) # for ddply
-library(dplyr) # for mutate
 library(car) # for Anova
 library(emmeans) # for emmeans
 library(lme4) # for glmer
