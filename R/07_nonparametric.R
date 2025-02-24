@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/23/2025
 ###
 
 ### BSD 2-Clause License
@@ -49,7 +49,7 @@ library(coin) # for median_test,
               #     friedman_test
 library(rcompanion) # for wilcoxonZ
 library(reshape2) # for dcast
-library(performance) # for check_sphericity
+library(performance) # for check_*
 library(ARTool) # for art, art.con
 
 
@@ -107,7 +107,7 @@ par(mfrow=c(2,1))
 par(mfrow=c(1,1))
 
 # independent-samples t-test
-t.test(Minutes ~ Engine, var.equal=TRUE, data=df)  # Student's
+t.test(Minutes ~ Engine, data=df, var.equal=TRUE)  # Student's
 cohens_d(Minutes ~ Engine, data=df)
 
 # Brown-Mood median test
@@ -181,6 +181,8 @@ par(mfrow=c(1,1))
 
 # one-way ANOVA
 m = aov_ez(dv="Minutes", between="Engine", id="PId", type=3, data=df)
+print(check_normality(m))
+print(check_homogeneity(m))
 anova(m)
 
 # post hoc pairwise comparisons
@@ -333,8 +335,8 @@ par(mfrow=c(1,1))
 
 # repeated measures ANOVA
 m = aov_ez(dv="Throughput", within="Mouse", id="PId", type=3, data=df)
+print(check_normality(m))
 print(check_sphericity(m))
-
 anova(m, correction="none")
 
 # post hoc pairwise comparisons
@@ -440,8 +442,8 @@ with(df,
        main="WPM by Keyboard, Posture",
        lty=c(2,1), 
        lwd=c(3,3), 
-       col=c("darkgreen","darkgray"))
-)
+       col=c("darkgreen","darkgray")
+))
 msd <- ddply(df, ~ Posture + Keyboard, function(data) c(
   "Mean"=mean(data$WPM), 
   "SD"=sd(data$WPM)
@@ -454,13 +456,15 @@ arrows(x0=2+dx, y0=msd[4,]$Mean - msd[4,]$SD, x1=2+dx, y1=msd[4,]$Mean + msd[4,]
 
 # two-way ANOVA
 m0 = aov_ez(dv="WPM", between=c("Keyboard","Posture"), id="PId", type=3, data=df)
+print(check_normality(m0))
+print(check_homogeneity(m0))
 anova(m0)
 
 # post hoc pairwise comparisons
 emmeans(m0, pairwise ~ Keyboard*Posture, adjust="holm")
 
 # ART
-m = art(WPM ~ Keyboard * Posture, data=df)
+m = art(WPM ~ Keyboard*Posture, data=df)
 anova(m)
 
 # ART-C post hoc pairwise comparisons
@@ -489,8 +493,8 @@ summary(df)
 
 # build an ANOVA model
 m0 = aov_ez(dv="WPM", within=c("Keyboard","Posture"), id="PId", type=3, data=df)
+print(check_normality(m0))
 print(check_sphericity(m0))
-
 anova(m0, correction="none")
 
 # post hoc pairwise comparisons
@@ -527,8 +531,9 @@ summary(df)
 
 # build an ANOVA model
 m0 = aov_ez(dv="WPM", between="Keyboard", within="Posture", id="PId", type=3, data=df)
+print(check_normality(m0))
+print(check_homogeneity(m0))
 print(check_sphericity(m0))
-
 anova(m0, correction="none")
 
 # post hoc pairwise comparisons

@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/21/2025
 ###
 
 ### BSD 2-Clause License
@@ -253,27 +253,28 @@ View(xt)
 symmetry_test(Desktop ~ Mobile | PId, data=df)
 
 # compare Android vs. iPhone within Linux
-df$Chose.Linux.w.Android = ifelse(df$Mobile == "Android" & df$Desktop == "Linux", 1, 0)
-df$Chose.Linux.w.iPhone = ifelse(df$Mobile == "iPhone" & df$Desktop == "Linux", 1, 0)
+df$Chose.Linux.w.Android = ifelse(df$Desktop == "Linux" & df$Mobile == "Android", 1, 0)
+df$Chose.Linux.w.iPhone = ifelse(df$Desktop == "Linux" & df$Mobile == "iPhone", 1, 0)
 sum(df$Chose.Linux.w.Android) # 23
 sum(df$Chose.Linux.w.iPhone)  # 15
 sign_test(Chose.Linux.w.Android ~ Chose.Linux.w.iPhone, data=df)
 
 # compare Android vs. iPhone within Apple macOS
-df$Chose.macOS.w.Android = ifelse(df$Mobile == "Android" & df$Desktop == "macOS", 1, 0)
-df$Chose.macOS.w.iPhone = ifelse(df$Mobile == "iPhone" & df$Desktop == "macOS", 1, 0)
+df$Chose.macOS.w.Android = ifelse(df$Desktop == "macOS" & df$Mobile == "Android", 1, 0)
+df$Chose.macOS.w.iPhone = ifelse(df$Desktop == "macOS" & df$Mobile == "iPhone", 1, 0)
 sum(df$Chose.macOS.w.Android) # 29
 sum(df$Chose.macOS.w.iPhone)  # 49
 sign_test(Chose.macOS.w.Android ~ Chose.macOS.w.iPhone, data=df)
 
 # compare Android vs. iPhone within Microsoft Windows
-df$Chose.Windows.w.Android = ifelse(df$Mobile == "Android" & df$Desktop == "Windows", 1, 0)
-df$Chose.Windows.w.iPhone = ifelse(df$Mobile == "iPhone" & df$Desktop == "Windows", 1, 0)
+df$Chose.Windows.w.Android = ifelse(df$Desktop == "Windows" & df$Mobile == "Android", 1, 0)
+df$Chose.Windows.w.iPhone = ifelse(df$Desktop == "Windows" & df$Mobile == "iPhone", 1, 0)
 sum(df$Chose.Windows.w.Android) # 48
 sum(df$Chose.Windows.w.iPhone)  # 36
 sign_test(Chose.Windows.w.Android ~ Chose.Windows.w.iPhone, data=df)
 
 # adjustment for multiple comparisons
 p.adjust(c(0.1944, 0.02354, 0.1904), method="holm")
+
 
 

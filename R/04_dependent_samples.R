@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/22/2025
 ###
 
 ### BSD 2-Clause License
@@ -41,7 +41,7 @@ library(plyr) # for ddply
 library(dplyr) # for case_match
 library(EnvStats) # for gofTest
 library(afex) # for for aov_ez
-library(performance) # for check_sphericity
+library(performance) # for check_*
 library(reshape2) # for dcast
 library(emmeans) # for emmeans
 library(effectsize) # for cohens_d
@@ -117,17 +117,18 @@ shapiro.test(df$Residuals)
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="Throughput", within="Mouse", id="PId", type=3, data=df)
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r,xlim=c(-2,+2), ylim=c(0,12.8), main="Histogram of Residuals", freq=TRUE)  # frequency (counts)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.8), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # paired-samples t-test
 df2 <- dcast(df, PId ~ Mouse, value.var="Throughput")  # make wide-format table
@@ -218,21 +219,22 @@ shapiro.test(df$Residuals)
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="Throughput", within="Mouse", id="PId", type=3, data=df)
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-2,+2), ylim=c(0,16.8), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.7), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # sphericity assumption
-summary(m)                  # Mauchly's test for sphericity
-print(check_sphericity(m))  # Mauchly's test for sphericity
+summary(m)$sphericity.tests # Mauchly's test of sphericity
+print(check_sphericity(m))  # same
 
 # one-way repeated measures ANOVA
 anova(m, correction="none") # use if p≥.05, no violation of sphericity

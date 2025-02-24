@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/23/2025
 ###
 
 ### BSD 2-Clause License
@@ -87,23 +87,23 @@ par(mfrow=c(3,1))
        main="Distribution of First Throughput", 
        xlab="Throughput (bits/s)",
        ylab="Frequency",
-       xlim=c(2.5,6.0),
+       xlim=c(3.0,6.0),
        ylim=c(0,8),
-       breaks=seq(2.5,6.0,0.5))
+       breaks=seq(3.0,6.0,0.5))
   hist(df[df$Order == "2",]$Throughput, 
        main="Distribution of Second Throughput", 
        xlab="Throughput (bits/s)",
        ylab="Frequency",
-       xlim=c(2.5,6.0),
+       xlim=c(3.0,6.0),
        ylim=c(0,8),
-       breaks=seq(2.5,6.0,0.5))
+       breaks=seq(3.0,6.0,0.5))
   hist(df[df$Order == "3",]$Throughput, 
        main="Distribution of Third Throughput", 
        xlab="Throughput (bits/s)",
        ylab="Frequency",
-       xlim=c(2.5,6.0),
+       xlim=c(3.0,6.0),
        ylim=c(0,8),
-       breaks=seq(2.5,6.0,0.5))
+       breaks=seq(3.0,6.0,0.5))
 par(mfrow=c(1,1))
 
 # normality of conditional response
@@ -126,17 +126,17 @@ shapiro.test(df$Residuals)
 # check for an Order effect
 m = lmer(Throughput ~ Order + (1|PId), data=df)
 r = residuals(m) # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-2,+2), ylim=c(0,14.5), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.6), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
 
 # analysis of variance
 Anova(m, type=3, test.statistic="F")
@@ -150,25 +150,22 @@ emmeans(m, pairwise ~ Order, adjust="holm")
 # check the Mouse x Order interaction
 m = lmer(Throughput ~ Mouse*Order + (1|PId), data=df)
 r = residuals(m) # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-1.5,+1.5), ylim=c(0,19), main="Histogram of Residuals", freq=TRUE) # frequency (counts)
 hist(r, xlim=c(-1.5,+1.5), ylim=c(0,0.8), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residudals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
 
 # analysis of variance
 Anova(m, type=3, test.statistic="F")
 
 # partial eta-squared effect size
 eta_squared(m, partial=TRUE)
-
-# post hoc pairwise comparisons
-emmeans(m, pairwise ~ Order, adjust="holm")
 
 

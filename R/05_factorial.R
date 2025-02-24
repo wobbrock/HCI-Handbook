@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/23/2025
 ###
 
 ### BSD 2-Clause License
@@ -42,7 +42,7 @@ library(dplyr) # for case_match
 library(EnvStats) # for gofTest
 library(car) # for leveneTest, Anova
 library(afex) # for for aov_ez
-library(performance) # for check_homogeneity, check_sphericity
+library(performance) # for check_*
 library(effectsize) # for eta_squared
 library(emmeans) # for emmeans
 
@@ -129,8 +129,8 @@ with(df,
     main="WPM by Keyboard, Posture",
     lty=c(2,1), 
     lwd=c(3,3), 
-    col=c("darkgreen","darkgray"))
-)
+    col=c("darkgreen","darkgray")
+))
 msd <- ddply(df, ~ Posture + Keyboard, function(data) c(
   "Mean"=mean(data$WPM), 
   "SD"=sd(data$WPM)
@@ -163,20 +163,19 @@ shapiro.test(df$Residuals)
 
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="WPM", between=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m))
-
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-20,+20), ylim=c(0,16), main="Histogram of Residuals", freq=TRUE)      # frequency (counts)
 hist(r, xlim=c(-20,+20), ylim=c(0,0.0665), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # homogeneity of variance, a/k/a homoscedasticity
 leveneTest(WPM ~ Keyboard*Posture, center=median, data=df) # Brown-Forstye test (default)
@@ -216,24 +215,23 @@ summary(df)
 
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="WPM", within=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m))
-
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-20,+20), ylim=c(0,16), main="Histogram of Residuals", freq=TRUE)      # frequency (counts)
 hist(r, xlim=c(-20,+20), ylim=c(0,0.0665), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # sphericity assumption
-summary(m)                  # Mauchly's test for sphericity
-print(check_sphericity(m))  # Mauchly's test for sphericity
+summary(m)$sphericity.tests # Mauchly's test of sphericity
+print(check_sphericity(m))  # same
 
 # two-way repeated measures ANOVA
 anova(m, correction="none") # use if p≥.05, no violation of sphericity
@@ -266,27 +264,26 @@ summary(df)
 
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="WPM", between="Keyboard", within="Posture", id="PId", type=3, data=df)
-print(check_normality(m))
-
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-20,+20), ylim=c(0,16), main="Histogram of Residuals", freq=TRUE)      # frequency (counts)
 hist(r, xlim=c(-20,+20), ylim=c(0,0.0665), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # homogeneity of variance, a/k/a homoscedasticity
 print(check_homogeneity(m))
 
 # sphericity assumption
-summary(m)                  # Mauchly's test for sphericity
-print(check_sphericity(m))  # Mauchly's test for sphericity
+summary(m)$sphericity.tests # Mauchly's test of sphericity
+print(check_sphericity(m))  # same
 
 # two-way mixed factorial ANOVA
 anova(m, correction="none") # use if p≥.05, no violation of sphericity

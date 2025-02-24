@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/23/2025
 ###
 
 ### BSD 2-Clause License
@@ -41,7 +41,7 @@ library(plyr) # for ddply
 library(EnvStats) # for gofTest
 library(car) # for leveneTest, Anova
 library(afex) # for for aov_ez
-library(performance) # for check_homogeneity
+library(performance) # for check_*
 library(effectsize) # for cohens_d
 
 
@@ -147,12 +147,14 @@ print(f)
 m = aov_ez(dv="Hours", between="IDE", id="PId", type=3, data=df)
 print(check_normality(m))
 
-r = residuals(m$lm)  # extract residuals
+r = residuals(m$lm) # extract residuals
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 hist(r, main="Histogram of Residuals")
+shapiro.test(r)
 
 r.10 = r + 10  # shift by +10 to make non-negative for lognormal fit
 hist(r.10, main="Histogram of Residuals", freq=FALSE) # density
-
 f = gofTest(r.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
 print(f)
@@ -162,18 +164,12 @@ print(f)
 
 # take the log of the residuals and fit a normal curve to it
 log.r.10 = log(r.10)
+plot(log.r.10[1:length(log.r.10)], main="Plot of log(Residuals)"); abline(h=mean(log.r.10))
+qqnorm(log.r.10); qqline(log.r.10)
 hist(log.r.10, main="Histogram of log(Residuals)", freq=FALSE)
 f = gofTest(log.r.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
 print(f)
-
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-plot(log.r.10[1:length(log.r.10)], main="Plot of log(Residuals)"); abline(h=mean(log.r.10))
-qqnorm(log.r.10); qqline(log.r.10)
-
-shapiro.test(r)
 shapiro.test(log.r.10)
 
 # make a log-transformed dependent variable and re-test normality
@@ -184,9 +180,13 @@ shapiro.test(df[df$IDE == "Nobugs",]$logHours)
 shapiro.test(df[df$IDE == "VStudio",]$logHours)
 
 m = aov_ez(dv="logHours", between="IDE", id="PId", type=3, data=df)
+print(check_normality(m))
 
-r = residuals(m$lm)  # extract residuals
+r = residuals(m$lm) # extract residuals
+plot(r[1:length(r)], main="Plot of log(Hours) Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 hist(r, main="Histogram of log(Hours) Residuals", freq=FALSE)
+shapiro.test(r)
 
 r.1 = r + 1  # shift by +1 to enable lognormal fit
 hist(r.1, main="Histogram of log(Hours) Residuals", freq=FALSE)
@@ -197,11 +197,6 @@ print(f)
 f = gofTest(r.1, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # normal curve
 print(f)
-
-plot(r[1:length(r)], main="Plot of log(Hours) Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
 
 # visualize logHours before testing
 boxplot(logHours ~ IDE,
@@ -214,11 +209,11 @@ boxplot(logHours ~ IDE,
 # homogeneity of variance, a/k/a homoscedasticity
 leveneTest(logHours ~ IDE, center=median, data=df) # Brown-Forstye test (default)
 leveneTest(logHours ~ IDE, center=mean, data=df)   # Levene's test
-print(check_homogeneity(m))                        # Levene's test
+print(check_homogeneity(m))                        # same
 
 # independent-samples t-test
-t.test(logHours ~ IDE, var.equal=TRUE, data=df)  # Student's
-t.test(logHours ~ IDE, var.equal=FALSE, data=df) # Welch
+t.test(logHours ~ IDE, var.equal=TRUE, data=df)    # Student
+t.test(logHours ~ IDE, var.equal=FALSE, data=df)   # Welch
 
 # Cohen's d effect size
 cohens_d(logHours ~ IDE, data=df)

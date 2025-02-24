@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/21/2025
 ###
 
 ### BSD 2-Clause License
@@ -101,7 +101,7 @@ moe = ca * sd(df$Hours) / sqrt(nrow(df)) # margin of error
 Bl = mean(df$Hours) - moe                # CI lower bound
 Bu = mean(df$Hours) + moe                # CI upper bound
 dx = mean(df$Hours) - 20.0               # delta x
-SE = (Bu - Bl) / (2 * ca)                # standard error
+SE = (Bu - Bl) / (2*ca)                  # standard error
 Z = abs(dx / SE)                         # absolute Z-score
 p = exp(-0.717*Z - 0.416*Z*Z)            # p-value
 

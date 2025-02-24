@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/21/2025
 ###
 
 ### BSD 2-Clause License
@@ -43,7 +43,7 @@ library(EnvStats) # for gofTest
 library(BayesFactor) # for ttestBF, anoveBF, posterior 
 library(bayestestR) # for hdi
 library(afex) # for aov_ez
-library(performance) # for check_normality, check_homogeneity
+library(performance) # for check_*
 library(lme4) # for lmer
 library(lmerTest)
 library(car) # for Anova
@@ -143,7 +143,7 @@ boxplot(Minutes ~ Engine,
 
 # build an ANOVA model and test normality and homoscedasticity
 m = aov_ez(dv="Minutes", between="Engine", id="PId", type=3, data=df)
-print(check_normality(m)) # Shapiro-Wilk
+print(check_normality(m))   # Shapiro-Wilk
 print(check_homogeneity(m)) # Levene's test
 
 # independent-samples t-test
@@ -255,8 +255,8 @@ with(df,
        main="WPM by Keyboard, Posture",
        lty=c(2,1), 
        lwd=c(3,3), 
-       col=c("darkgreen","darkgray"))
-)
+       col=c("darkgreen","darkgray")
+))
 msd <- ddply(df, ~ Posture + Keyboard, function(data) c(
   "Mean"=mean(data$WPM), 
   "SD"=sd(data$WPM)
@@ -279,7 +279,7 @@ anova(m)
 emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 
 ## Bayesian approach
-bf = anovaBF(formula = WPM ~ Keyboard * Posture, data=df)
+bf = anovaBF(formula = WPM ~ Keyboard*Posture, data=df)
 print(bf)
 
 # to sample from the posterior, provide an index 1-4

@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/03/2024
+### Last Updated: 02/22/2025
 ###
 
 ### BSD 2-Clause License
@@ -42,7 +42,7 @@ library(dplyr) # for case_match
 library(EnvStats) # for gofTest
 library(car) # for leveneTest, Anova
 library(afex) # for for aov_ez
-library(performance) # for check_homogeneity
+library(performance) # for check_*
 library(emmeans) # for emmeans
 library(effectsize) # for cohens_d, eta_squared
 
@@ -117,17 +117,18 @@ shapiro.test(df$Residuals)
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="Minutes", between="Engine", id="PId", type=3, data=df)
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-2,+2), main="Histogram of Residuals", freq=TRUE)  # frequency (counts)
 hist(r, xlim=c(-2,+2), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # homogeneity of variance, a/k/a homoscedasticity
 leveneTest(Minutes ~ Engine, center=median, data=df) # Brown-Forstye test (default)
@@ -135,8 +136,8 @@ leveneTest(Minutes ~ Engine, center=mean, data=df)   # Levene's test
 print(check_homogeneity(m))                          # Levene's test
 
 # independent-samples t-test
-t.test(Minutes ~ Engine, var.equal=TRUE, data=df)  # Student's
-t.test(Minutes ~ Engine, var.equal=FALSE, data=df) # Welch
+t.test(Minutes ~ Engine, data=df, var.equal=TRUE)  # Student's
+t.test(Minutes ~ Engine, data=df, var.equal=FALSE) # Welch
 cohens_d(Minutes ~ Engine, data=df)
 
 
@@ -219,17 +220,18 @@ shapiro.test(df$Residuals)
 # we can build an ANOVA model and test residuals this way
 m = aov_ez(dv="Minutes", between="Engine", id="PId", type=3, data=df)
 r = residuals(m$lm)  # extract residuals
+mean(r); sum(r) # should be ~0
+
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 
 hist(r, xlim=c(-2,+2), ylim=c(0,6), main="Histogram of Residuals", freq=TRUE)    # frequency (counts)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.5), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
-
-shapiro.test(r)
+print(f) # Shapiro-Wilk test
+shapiro.test(r) # same
+print(check_normality(m)) # same
 
 # homogeneity of variance, a/k/a homoscedasticity
 leveneTest(Minutes ~ Engine, center=median, data=df) # Brown-Forstye test (default)

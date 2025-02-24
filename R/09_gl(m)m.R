@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/06/2024
+### Last Updated: 02/23/2025
 ###
 
 ### BSD 2-Clause License
@@ -64,7 +64,7 @@ df <- read.csv(".\\data\\09a_glm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
-df$Adoption = factor(df$Adoption) # D.V.
+df$Adoption = factor(df$Adoption, levels=c("yes","no")) # D.V.
 contrasts(df$Interface) <- "contr.sum"
 contrasts(df$Activity) <- "contr.sum"
 View(df)
@@ -79,22 +79,22 @@ ddply(df, ~ Interface + Activity, function(data) c(
 ))
 
 par(mfrow=c(1,2))
-  plot(Adoption ~ Interface, data=df, main="Adoption by Interface",col=c("lightgreen","pink"))
-  plot(Adoption ~ Activity, data=df, main="Adoption by Activity", col=c("lightgreen","pink"))
+  plot(Adoption ~ Interface, data=df, main="Adoption by Interface",col=c("pink","lightgreen"))
+  plot(Adoption ~ Activity, data=df, main="Adoption by Activity", col=c("pink","lightgreen"))
 par(mfrow=c(1,1))
 
 xt = xtabs( ~ Interface + Activity + Adoption, data=df)
-mosaicplot(xt, main="Adoption by Interface, Activity", cex=0.8, col=c("pink","lightgreen"))
+mosaicplot(xt, main="Adoption by Interface, Activity", cex=0.8, col=c("lightgreen","pink"))
 
 # logistic regression
-m = glm(Adoption ~ Interface * Activity, data=df, family=binomial)
+m = glm(Adoption ~ Interface*Activity, data=df, family=binomial)
 Anova(m, type=3)
 
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Interface*Activity, adjust="holm")
 
 # For illustration, we can also run this using the multinomial-Poisson trick (Baker 1994).
-m0 = glm.mp(Adoption ~ Interface * Activity, data=df)
+m0 = glm.mp(Adoption ~ Interface*Activity, data=df)
 Anova.mp(m0, type=3)
 glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 
@@ -111,7 +111,7 @@ df <- read.csv(".\\data\\09a_glmm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
-df$Adoption = factor(df$Adoption) # D.V.
+df$Adoption = factor(df$Adoption, levels=c("yes","no")) # D.V.
 contrasts(df$Interface) <- "contr.sum"
 contrasts(df$Activity) <- "contr.sum"
 View(df)
@@ -129,7 +129,7 @@ emmeans(m, pairwise ~ Interface*Activity, adjust="holm")
 # For illustration, we can also run this using the multinomial-Poisson trick (Baker 1994).
 m0 = glmer.mp(Adoption ~ Interface*Activity + (1|PId), data=df)
 Anova.mp(m0, type=3)
-glmer.mp.con(m0, pairwise ~ Interface * Activity, adjust="holm")
+glmer.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 
 
 
@@ -145,7 +145,7 @@ df <- read.csv(".\\data\\09b_glm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
-df$Adoption = factor(df$Adoption) # D.V.
+df$Adoption = factor(df$Adoption, levels=c("yes","no","maybe")) # D.V.
 contrasts(df$Interface) <- "contr.sum"
 contrasts(df$Activity) <- "contr.sum"
 View(df)
@@ -161,21 +161,30 @@ ddply(df, ~ Interface + Activity, function(data) c(
 ))
 
 par(mfrow=c(1,2))
-  plot(Adoption ~ Interface, data=df, main="Adoption by Interface", col=c("lightgreen","pink","lightyellow"))
-  plot(Adoption ~ Activity, data=df, main="Adoption by Activity", col=c("lightgreen","pink","lightyellow"))
+  plot(Adoption ~ Interface, data=df, main="Adoption by Interface", col=c("lightyellow","pink","lightgreen"))
+  plot(Adoption ~ Activity, data=df, main="Adoption by Activity", col=c("lightyellow","pink","lightgreen"))
 par(mfrow=c(1,1))
 
 xt = xtabs( ~ Interface + Activity + Adoption, data=df)
-mosaicplot(xt, main="Adoption by Interface, Activity", col=c("lightyellow","pink","lightgreen"))
+mosaicplot(xt, main="Adoption by Interface, Activity", col=c("lightgreen","pink","lightyellow"))
 
 # Unfortunately, there is no family=multinomial option for glm. But
 # nnet::multinom offers an equivalent we can use.
-m = multinom(Adoption ~ Interface * Activity, data=df, trace=FALSE)
+m = multinom(Adoption ~ Interface*Activity, data=df, trace=FALSE)
 Anova(m, type=3)
 
-# Unfortunately, post hoc pairwise comparisons with emmeans are thorny for
-# multinom models. So we use the multinomial-Poisson trick instead (Baker 1994).
-m0 = glm.mp(Adoption ~ Interface * Activity, data=df)
+# Unfortunately, post hoc pairwise comparisons with emmeans are tricky for
+# multinom models. They can be conducted as follows but tend to be overly
+# conservative.
+emmeans::test(
+  contrast(
+    emmeans(m, ~ Interface*Activity | Adoption, mode="latent"), 
+    method="pairwise", ref=1), 
+  joint=TRUE, by="contrast"
+)
+
+# A better approach is to use the multinomial-Poisson trick (Baker 1994).
+m0 = glm.mp(Adoption ~ Interface*Activity, data=df)
 Anova.mp(m0, type=3)
 glm.mp.con(m0, pairwise ~ Interface*Activity, adjust="holm")
 
@@ -193,7 +202,7 @@ df <- read.csv(".\\data\\09b_glmm.csv")
 df$PId = factor(df$PId)
 df$Interface = factor(df$Interface)
 df$Activity = factor(df$Activity)
-df$Adoption = factor(df$Adoption) # D.V.
+df$Adoption = factor(df$Adoption, levels=c("yes","no","maybe")) # D.V.
 contrasts(df$Interface) <- "contr.sum"
 contrasts(df$Activity) <- "contr.sum"
 View(df)
@@ -205,10 +214,13 @@ View(df)
 # nnet::multinom cannot accept random factors, e.g., (1|PId), so it cannot
 # handle repeated measures.
 
-# Fortunately, we can run this using the multinomial-Poisson trick (Baker 1994).
-m = glmer.mp(Adoption ~ Interface*Activity + (1|PId), data=df)
+# Fortunately, we can run this analysis using the multinomial-Poisson trick 
+# (Baker 1994).
+m = glmer.mp(Adoption ~ Interface*Activity + (1|PId), data=df, 
+             control=glmerControl(optimizer="nloptwrap")) # change the optimizer
 Anova.mp(m, type=3)
-glmer.mp.con(m, pairwise ~ Interface*Activity, adjust="holm")
+glmer.mp.con(m, pairwise ~ Interface*Activity, adjust="holm", 
+             control=glmerControl(optimizer="nloptwrap"))
 
 
 
@@ -251,14 +263,17 @@ par(mfrow=c(2,2))
   hist(as.numeric(df[df$Technique == "press" & df$Hands == 2,]$Agreement), xlim=c(1,7), ylim=c(0,8), breaks=seq(1,7,1), main="Press, 2 Hands", xlab="Agreement", ylab="Count")
 par(mfrow=c(1,1))
 
-with(df, interaction.plot(
-  Technique, Hands, as.numeric(Agreement), 
-  ylim=c(1,7),
-  lwd=3,
-  lty=1,
-  main="Agreement by Technique, Hands",
-  ylab="Agreement",
-  col=c("darkgreen","blue")
+with(df, 
+     interaction.plot(
+       Technique, 
+       Hands, 
+       as.numeric(Agreement), 
+       ylim=c(1,7),
+       lwd=3,
+       lty=1,
+       main="Agreement by Technique, Hands",
+       ylab="Agreement",
+       col=c("darkgreen","blue")
 ))
 msd <- ddply(df, ~ Technique + Hands, function(data) c(
   "Mean"=mean(as.numeric(data$Agreement)),
@@ -271,7 +286,7 @@ arrows(x0=2-dx, y0=msd[3,]$Mean - msd[3,]$SD, x1=2-dx, y1=msd[3,]$Mean + msd[3,]
 arrows(x0=2+dx, y0=msd[4,]$Mean - msd[4,]$SD, x1=2+dx, y1=msd[4,]$Mean + msd[4,]$SD, angle=90, code=3, lty=1, lwd=2, length=0.3, col="blue")
 
 # ordinal logistic regression
-m = polr(Agreement ~ Technique * Hands, data=df, Hess=TRUE)
+m = polr(Agreement ~ Technique*Hands, data=df, Hess=TRUE)
 Anova(m, type=3)
 
 # post hoc pairwise comparisons
@@ -389,7 +404,7 @@ lines(x, dpois(x, lambda=f$estimate[1]), lwd=3, col="darkgreen")
 gofstat(fitdist(dv, "pois"))
 
 # fit a Poisson regression model
-m = glm(Errors ~ Recognizer * Device, data=df, family=poisson)
+m = glm(Errors ~ Recognizer*Device, data=df, family=poisson)
 
 # check for overdispersion
 print(check_overdispersion(m))
@@ -529,7 +544,7 @@ lines(x, dpois(x, lambda=f$estimate[1]), lwd=3, col="darkgreen")
 gofstat(f)
 
 # fit a regular Poisson regression model
-m0 = glm(Errors ~ Recognizer * Device, data=df, family=poisson)
+m0 = glm(Errors ~ Recognizer*Device, data=df, family=poisson)
 
 # check for overdispersion
 print(check_overdispersion(m0))
@@ -548,7 +563,7 @@ dv = df[df$Recognizer == "rubine" & df$Device == "mouse",]$Errors
 abs(var(dv)/mean(dv)) > 1.15
 
 # fit a quasi-Poisson model to address mild overdispersion
-m1 = glm(Errors ~ Recognizer * Device, data=df, family=quasipoisson)
+m1 = glm(Errors ~ Recognizer*Device, data=df, family=quasipoisson)
 
 # compare analyses of variance
 Anova(m0, type=3) # family=poisson
@@ -591,7 +606,7 @@ lines(x, dnbinom(x, size=f$estimate[1], mu=f$estimate[2]), lwd=3, col="darkgreen
 gofstat(f)
 
 # fit a negative binomial regression model
-m = glm.nb(Errors ~ Recognizer * Device, data=df)
+m = glm.nb(Errors ~ Recognizer*Device, data=df)
 print(check_overdispersion(m))
 Anova(m, type=3)
 
@@ -734,7 +749,7 @@ lines(x, dpois(x, lambda=f$estimate[1]), lwd=3, col="darkgreen")
 gofstat(f)
 
 # fit a regular Poisson regression model
-m0 = glm(Errors ~ Recognizer * Device, data=df, family=poisson)
+m0 = glm(Errors ~ Recognizer*Device, data=df, family=poisson)
 
 # check for overdispersion
 print(check_overdispersion(m0))
@@ -743,7 +758,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a zero-inflated Poisson regression model
-m = glmmTMB(Errors ~ Recognizer * Device, data=df, family=poisson, ziformula=~1)
+m = glmmTMB(Errors ~ Recognizer*Device, data=df, family=poisson, ziformula=~1)
 
 # analysis of variance
 Anova(m, type=3)
@@ -784,7 +799,7 @@ lines(x, dnbinom(x, size=f$estimate[1], mu=f$estimate[2]), lwd=3, col="darkgreen
 gofstat(f)
 
 # fit a regular negative binomial regression model
-m0 = glm.nb(Errors ~ Recognizer * Device, data=df)
+m0 = glm.nb(Errors ~ Recognizer*Device, data=df)
 
 # check for overdispersion
 print(check_overdispersion(m0))
@@ -793,7 +808,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a zero-inflated negative binomial regression model
-m = glmmTMB(Errors ~ Recognizer * Device, data=df, family=nbinom2, ziformula=~1)
+m = glmmTMB(Errors ~ Recognizer*Device, data=df, family=nbinom2, ziformula=~1)
 
 # analysis of variance
 Anova(m, type=3)
@@ -832,7 +847,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a mixed zero-inflated Poisson regression model
-m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson, REML=TRUE, ziformula=~1)
+m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson, ziformula=~1, REML=TRUE)
 
 # analysis of variance
 Anova(m, type=3)
@@ -851,7 +866,7 @@ print(check_overdispersion(m0))
 print(check_zeroinflation(m0))
 
 # fit a mixed zero-inflated negative binomial regression model
-m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=nbinom2, REML=TRUE, ziformula=~1)
+m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=nbinom2, ziformula=~1, REML=TRUE)
 
 # analysis of variance
 Anova(m, type=3)
@@ -940,5 +955,6 @@ Anova(m, type=3)
 
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ IDE, adjust="holm")
+
 
 

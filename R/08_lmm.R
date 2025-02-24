@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 12/04/2024
+### Last Updated: 02/23/2025
 ###
 
 ### BSD 2-Clause License
@@ -44,7 +44,7 @@ library(nlme) # for lme
 library(emmeans) # for emmeans
 library(car) # for leveneTest, Anova
 library(afex) # for for aov_ez
-library(performance) # for check_homogeneity, check_sphericity
+library(performance) # for check_*
 library(effectsize) # for eta_squared
 library(EnvStats) # for gofTest
 
@@ -78,7 +78,6 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 
 # fixed-effects ANOVA
 m0 = aov_ez(dv="WPM", within=c("Keyboard","Posture"), id="PId", type=3, data=df)
-
 print(check_normality(m0))  # normality
 print(check_sphericity(m0)) # sphericity
 
@@ -141,7 +140,7 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 m0 = aov_ez(dv="WPM", between="Keyboard", within="Posture", id="PId", type=3, data=df)
 print(check_normality(m0))   # Shapiro-Wilk
 print(check_homogeneity(m0)) # Levene's test
-print(check_sphericity(m0))  # Mauchly's test for sphericity
+print(check_sphericity(m0))  # Mauchly's test of sphericity
 
 # two-way repeated measures ANOVA
 anova(m0, correction="none")
@@ -225,7 +224,7 @@ par(mfrow=c(2,1))
      main="Distribution of Nobugs Hours", 
      xlab="Hours",
      ylab="Frequency",
-     xlim=c(0,30),
+     xlim=c(0,25),
      ylim=c(0,90),
      breaks=seq(0,30,3),
      col="pink")
@@ -233,7 +232,7 @@ par(mfrow=c(2,1))
      main="Distribution of Microsoft Visual Studio Hours", 
      xlab="Hours",
      ylab="Frequency",
-     xlim=c(0,30),
+     xlim=c(0,25),
      ylim=c(0,90),
      breaks=seq(0,30,3),
      col="lightblue")
@@ -271,6 +270,8 @@ df$Residuals = ifelse(
 shapiro.test(df$Residuals)
 
 # plot and test the residuals calculated above
+plot(df$Residuals, main="Plot of Residuals"); abline(h=0)
+qqnorm(df$Residuals); qqline(df$Residuals)
 hist(df$Residuals, main="Histogram of Residuals", ylim=c(0,0.15), freq=FALSE)
 
 df$Residuals.10 = df$Residuals + 10  # shift by +10 to make non-negative for lognormal fit
@@ -281,21 +282,16 @@ print(f)
 f = gofTest(df$Residuals.10, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # normal curve
 print(f)
+shapiro.test(df$Residuals.10)
 
 # take the log of the residuals and fit a normal curve to it
 df$log.Residuals.10 = log(df$Residuals.10)
+plot(df$log.Residuals.10, main="Plot of log(Residuals)"); abline(h=mean(df$log.Residuals.10))
+qqnorm(df$log.Residuals.10); qqline(df$log.Residuals.10)
 hist(df$log.Residuals.10, main="Histogram of log(Residuals)", freq=FALSE)
 f = gofTest(df$log.Residuals.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
 print(f)
-
-plot(df$Residuals, main="Plot of Residuals"); abline(h=0)
-qqnorm(df$Residuals); qqline(df$Residuals)
-
-plot(df$log.Residuals.10, main="Plot of log(Residuals)"); abline(h=mean(df$log.Residuals.10))
-qqnorm(df$log.Residuals.10); qqline(df$log.Residuals.10)
-
-shapiro.test(df$Residuals)
 shapiro.test(df$log.Residuals.10)
 
 # make a log-transformed dependent variable and re-test normality
@@ -316,19 +312,20 @@ boxplot(logHours ~ IDE,
 # build our LMM
 m = lmer(logHours ~ IDE + (1|App) + (1|University/PId), data=df)
 r = residuals(m)
+mean(r); sum(r) # should be ~0
 
 # normality
+plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
+qqnorm(r); qqline(r)
 hist(r, xlim=c(-1.5,+1.5), main="Histogram of Residuals", freq=FALSE)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
 print(f)
-plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
-qqnorm(r); qqline(r)
 shapiro.test(r)
 print(check_normality(m))
 
 # homoscedasticity
-print(check_homogeneity(m))  # Bartlett's test
+print(check_homogeneity(m)) # Bartlett's test
 
 # analysis of variance
 Anova(m, type=3, test.statistic="F", white.adjust=TRUE)
@@ -634,8 +631,8 @@ with(df,
     main="Videogame Hours per Week by Participant",
     lty=1, 
     lwd=3, 
-    col=colors)
-)
+    col=colors
+))
 
 # turn Week to numeric for exploring intercepts and slopes
 df$Week = as.numeric(df$Week)
