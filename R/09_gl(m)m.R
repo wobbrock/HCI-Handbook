@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/23/2025
+### Last Updated: 03/15/2025
 ###
 
 ### BSD 2-Clause License
@@ -174,8 +174,8 @@ m = multinom(Adoption ~ Interface*Activity, data=df, trace=FALSE)
 Anova(m, type=3)
 
 # Unfortunately, post hoc pairwise comparisons with emmeans are tricky for
-# multinom models. They can be conducted as follows but tend to be overly
-# conservative.
+# multinom models. Russ Lenth, author of the emmeans package, offered this
+# approach on StackExchange, but it can sometimes seem overly conservative.
 emmeans::test(
   contrast(
     emmeans(m, ~ Interface*Activity | Adoption, mode="latent"), 
@@ -300,22 +300,21 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 ##   ..mixed ordinal logistic regression
 ##
 
-# prepare data table
-df <- read.csv(".\\data\\09c_glmm.csv")
-df$PId = factor(df$PId)
-df$Technique = factor(df$Technique)
-df$Hands = factor(df$Hands)
-df$Agreement = ordered(df$Agreement) # D.V.
-contrasts(df$Technique) <- "contr.sum"
-contrasts(df$Hands) <- "contr.sum"
-View(df)
+# prepare data table. name it 'dt' to avoid an Anova.clmm bug.
+dt <- read.csv(".\\data\\09c_glmm.csv")
+dt$PId = factor(dt$PId)
+dt$Technique = factor(dt$Technique)
+dt$Hands = factor(dt$Hands)
+dt$Agreement = ordered(dt$Agreement) # D.V.
+contrasts(dt$Technique) <- "contr.sum"
+contrasts(dt$Hands) <- "contr.sum"
+View(dt)
 
 # The data is the same as 09c_glm.csv, but now within-subjects, not between-
 # subjects; therefore, we skip the descriptive statistics and visualizations.
 
 # mixed ordinal logistic regression
-df2 <- as.data.frame(df) # quirk enabling Anova.clmm to work
-m = clmm(Agreement ~ Technique*Hands + (1|PId), data=df2)
+m = clmm(Agreement ~ Technique*Hands + (1|PId), data=dt)
 Anova.clmm(m)
 
 # post hoc pairwise comparisons
