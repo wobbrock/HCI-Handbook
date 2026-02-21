@@ -2,13 +2,13 @@
 ### 09_gl(m)m.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 03/15/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -175,7 +175,8 @@ Anova(m, type=3)
 
 # Unfortunately, post hoc pairwise comparisons with emmeans are tricky for
 # multinom models. Russ Lenth, author of the emmeans package, offered this
-# approach on StackExchange, but it can sometimes seem overly conservative.
+# approach on StackExchange, but it seems overly conservative (i.e., prone
+# to Type II errors).
 emmeans::test(
   contrast(
     emmeans(m, ~ Interface*Activity | Adoption, mode="latent"), 
@@ -254,7 +255,11 @@ ddply(df, ~ Technique + Hands, function(data) c(
   "7"=sum(data$Agreement == 7)
 ))
 
-boxplot(Agreement ~ Technique + Hands, data=df, main="Agreement by Technique, Hands")
+boxplot(
+  Agreement ~ Technique + Hands, 
+  main="Agreement by Technique, Hands",
+  data=df
+)
 
 par(mfrow=c(2,2))
   hist(as.numeric(df[df$Technique == "pinch" & df$Hands == 1,]$Agreement), xlim=c(1,7), ylim=c(0,8), breaks=seq(1,7,1), main="Pinch, 1 Hand", xlab="Agreement", ylab="Count")
@@ -263,17 +268,16 @@ par(mfrow=c(2,2))
   hist(as.numeric(df[df$Technique == "press" & df$Hands == 2,]$Agreement), xlim=c(1,7), ylim=c(0,8), breaks=seq(1,7,1), main="Press, 2 Hands", xlab="Agreement", ylab="Count")
 par(mfrow=c(1,1))
 
-with(df, 
-     interaction.plot(
-       Technique, 
-       Hands, 
-       as.numeric(Agreement), 
-       ylim=c(1,7),
-       lwd=3,
-       lty=1,
-       main="Agreement by Technique, Hands",
-       ylab="Agreement",
-       col=c("darkgreen","blue")
+with(df, interaction.plot(
+  Technique, 
+  Hands, 
+  as.numeric(Agreement), 
+  ylim=c(1,7),
+  lwd=3,
+  lty=1,
+  main="Agreement by Technique, Hands",
+  ylab="Agreement",
+  col=c("darkgreen","blue")
 ))
 msd <- ddply(df, ~ Technique + Hands, function(data) c(
   "Mean"=mean(as.numeric(data$Agreement)),
@@ -300,7 +304,8 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 ##   ..mixed ordinal logistic regression
 ##
 
-# prepare data table. name it 'dt' to avoid an Anova.clmm bug.
+# prepare data table. name it 'dt' to avoid an Anova.clmm bug
+# that throws an error if it is named 'df'.
 dt <- read.csv(".\\data\\09c_glmm.csv")
 dt$PId = factor(dt$PId)
 dt$Technique = factor(dt$Technique)
@@ -350,7 +355,12 @@ ddply(df, ~ Recognizer + Device, function(data) c(
   "Max"=max(data$Errors)
 ))
 
-boxplot(Errors ~ Recognizer + Device, data=df, main="Errors by Recognizer, Device", xlab="Recognizer.Device")
+boxplot(
+  Errors ~ Recognizer + Device, 
+  main="Errors by Recognizer, Device", 
+  xlab="Recognizer.Device",
+  data=df
+)
 
 with(df, interaction.plot(
   Recognizer, Device, Errors, 
@@ -406,7 +416,7 @@ gofstat(fitdist(dv, "pois"))
 m = glm(Errors ~ Recognizer*Device, data=df, family=poisson)
 
 # check for overdispersion
-print(check_overdispersion(m))
+check_overdispersion(m)
 
 # check for overdispersion by condition
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
@@ -451,7 +461,7 @@ View(df)
 m = glmer(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson)
 
 # check for overdispersion
-print(check_overdispersion(m))
+check_overdispersion(m)
 
 # analysis of variance
 Anova(m, type=3)
@@ -490,7 +500,12 @@ ddply(df, ~ Recognizer + Device, function(data) c(
   "Max"=max(data$Errors)
 ))
 
-boxplot(Errors ~ Recognizer + Device, data=df, main="Errors by Recognizer, Device", xlab="Recognizer.Device")
+boxplot(
+  Errors ~ Recognizer + Device, 
+  main="Errors by Recognizer, Device", 
+  xlab="Recognizer.Device",
+  data=df
+)
 
 with(df, interaction.plot(
   Recognizer, Device, Errors, 
@@ -546,7 +561,7 @@ gofstat(f)
 m0 = glm(Errors ~ Recognizer*Device, data=df, family=poisson)
 
 # check for overdispersion
-print(check_overdispersion(m0))
+check_overdispersion(m0)
 
 # check for overdispersion by condition
 dv = df[df$Recognizer == "dollar" & df$Device == "stylus",]$Errors
@@ -606,7 +621,7 @@ gofstat(f)
 
 # fit a negative binomial regression model
 m = glm.nb(Errors ~ Recognizer*Device, data=df)
-print(check_overdispersion(m))
+check_overdispersion(m)
 Anova(m, type=3)
 
 # post hoc pairwise comparisons
@@ -636,7 +651,7 @@ View(df)
 m0 = glmer(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson)
 
 # check for overdispersion
-print(check_overdispersion(m0))
+check_overdispersion(m0)
 # p = .085, so we are very close to having overdispersion
 
 # check for overdispersion by condition
@@ -654,7 +669,7 @@ abs(var(dv)/mean(dv)) > 1.15
 
 # fit a mixed negative binomial regression model
 m1 = glmer.nb(Errors ~ Recognizer*Device + (1|PId), data=df)
-print(check_overdispersion(m1))
+check_overdispersion(m1)
 
 # compare analyses of variance
 Anova(m0, type=3) # Poisson
@@ -695,7 +710,12 @@ ddply(df, ~ Recognizer + Device, function(data) c(
   "Max"=max(data$Errors)
 ))
 
-boxplot(Errors ~ Recognizer + Device, data=df, main="Errors by Recognizer, Device", xlab="Recognizer.Device")
+boxplot(
+  Errors ~ Recognizer + Device, 
+  main="Errors by Recognizer, Device", 
+  xlab="Recognizer.Device",
+  data=df
+)
 
 with(df, interaction.plot(
   Recognizer, Device, Errors, 
@@ -751,10 +771,10 @@ gofstat(f)
 m0 = glm(Errors ~ Recognizer*Device, data=df, family=poisson)
 
 # check for overdispersion
-print(check_overdispersion(m0))
+check_overdispersion(m0)
 
 # check for zero-inflation
-print(check_zeroinflation(m0))
+check_zeroinflation(m0)
 
 # fit a zero-inflated Poisson regression model
 m = glmmTMB(Errors ~ Recognizer*Device, data=df, family=poisson, ziformula=~1)
@@ -801,10 +821,10 @@ gofstat(f)
 m0 = glm.nb(Errors ~ Recognizer*Device, data=df)
 
 # check for overdispersion
-print(check_overdispersion(m0))
+check_overdispersion(m0)
 
 # check for zero-inflation
-print(check_zeroinflation(m0))
+check_zeroinflation(m0)
 
 # fit a zero-inflated negative binomial regression model
 m = glmmTMB(Errors ~ Recognizer*Device, data=df, family=nbinom2, ziformula=~1)
@@ -840,10 +860,10 @@ View(df)
 m0 = glmer(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson)
 
 # check for overdispersion
-print(check_overdispersion(m0))
+check_overdispersion(m0)
 
 # check for zero-inflation
-print(check_zeroinflation(m0))
+check_zeroinflation(m0)
 
 # fit a mixed zero-inflated Poisson regression model
 m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=poisson, ziformula=~1, REML=TRUE)
@@ -859,10 +879,10 @@ emmeans(m, pairwise ~ Recognizer*Device, adjust="holm")
 m0 = glmer.nb(Errors ~ Recognizer*Device + (1|PId), data=df)
 
 # check for overdispersion
-print(check_overdispersion(m0))
+check_overdispersion(m0)
 
 # check for zero-inflation
-print(check_zeroinflation(m0))
+check_zeroinflation(m0)
 
 # fit a mixed zero-inflated negative binomial regression model
 m = glmmTMB(Errors ~ Recognizer*Device + (1|PId), data=df, family=nbinom2, ziformula=~1, REML=TRUE)
@@ -894,30 +914,32 @@ hist(dv, main="Nobugs Hours", xlab="Hours", freq=FALSE)
 
 f = gofTest(dv, distribution="gamma")
 curve(dgamma(x, shape=f$distribution.parameters[1], scale=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # gamma curve
-print(f) # Shapiro-Wilk: p = .223
+print.gof(f) # Shapiro-Wilk: p = .223
 
 f = gofTest(dv, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=2, lwd=3, add=TRUE) # lognormal curve
-print(f) # Shapiro-Wilk: p = .471
+print.gof(f) # Shapiro-Wilk: p = .471
 
 dv = df[df$IDE == "VStudio",]$Hours
 hist(dv, main="Microsoft Visual Studio Hours", xlab="Hours", freq=FALSE)
 
 f = gofTest(dv, distribution="gamma")
 curve(dgamma(x, shape=f$distribution.parameters[1], scale=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # Gamma curve
-print(f) # Shapiro-Wilk: p = .145
+print.gof(f) # Shapiro-Wilk: p = .145
 
 f = gofTest(dv, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=2, lwd=3, add=TRUE) # lognormal curve
-print(f) # Shapiro-Wilk: p = .675
+print.gof(f) # Shapiro-Wilk: p = .675
 
 # visualize before testing
-boxplot(Hours ~ IDE,
-        main="Hours by IDE",
-        xlab="IDE",
-        ylab="Hours",
-        col=c("pink","lightblue"),
-        data=df)
+boxplot(
+  Hours ~ IDE,
+  main="Hours by IDE",
+  xlab="IDE",
+  ylab="Hours",
+  col=c("pink","lightblue"),
+  data=df
+)
 
 # build Gamma regression model
 m = glm(Hours ~ IDE, data=df, family=Gamma)

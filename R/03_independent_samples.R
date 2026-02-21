@@ -2,13 +2,13 @@
 ### 03_independent_samples.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/22/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -73,12 +73,14 @@ ddply(df, ~ Engine, function(data) c(
 ))
 
 # boxplot
-boxplot(Minutes ~ Engine,
-   main="Minutes by Search Engine",
-   xlab="Search Engine",
-   ylab="Minutes",
-   col=c("lightblue","lightgreen"),
-   data=df)
+boxplot(
+  Minutes ~ Engine,
+  main="Minutes by Search Engine",
+  xlab="Search Engine",
+  ylab="Minutes",
+  col=c("lightblue","lightgreen"),
+  data=df
+)
 
 # make two stacked histograms
 par(mfrow=c(2,1))
@@ -126,18 +128,18 @@ hist(r, xlim=c(-2,+2), main="Histogram of Residuals", freq=TRUE)  # frequency (c
 hist(r, xlim=c(-2,+2), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # homogeneity of variance, a/k/a homoscedasticity
-leveneTest(Minutes ~ Engine, center=median, data=df) # Brown-Forstye test (default)
-leveneTest(Minutes ~ Engine, center=mean, data=df)   # Levene's test
-print(check_homogeneity(m))                          # Levene's test
+leveneTest(Minutes ~ Engine, data=df, center=median) # Brown-Forstye test (default)
+leveneTest(Minutes ~ Engine, data=df, center=mean)   # Levene's test
+check_homogeneity(m)                                 # Levene's test
 
 # independent-samples t-test
-t.test(Minutes ~ Engine, data=df, var.equal=TRUE)  # Student's
-t.test(Minutes ~ Engine, data=df, var.equal=FALSE) # Welch
+t.test(Minutes ~ Engine, data=df, var.equal=TRUE)    # Student's t-test
+t.test(Minutes ~ Engine, data=df, var.equal=FALSE)   # Welch's t-test
 cohens_d(Minutes ~ Engine, data=df)
 
 
@@ -168,12 +170,14 @@ ddply(df, ~ Engine, function(data) c(
 ))
 
 # boxplot
-boxplot(Minutes ~ Engine,
-        main="Minutes by Search Engine",
-        xlab="Search Engine",
-        ylab="Minutes",
-        col=c("lightblue","tan1","lightgreen"),
-        data=df)
+boxplot(
+  Minutes ~ Engine,
+  main="Minutes by Search Engine",
+  xlab="Search Engine",
+  ylab="Minutes",
+  col=c("lightblue","tan1","lightgreen"),
+  data=df
+)
 
 # make three stacked histograms
 par(mfrow=c(3,1))
@@ -229,14 +233,14 @@ hist(r, xlim=c(-2,+2), ylim=c(0,6), main="Histogram of Residuals", freq=TRUE)   
 hist(r, xlim=c(-2,+2), ylim=c(0,0.5), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # homogeneity of variance, a/k/a homoscedasticity
-leveneTest(Minutes ~ Engine, center=median, data=df) # Brown-Forstye test (default)
-leveneTest(Minutes ~ Engine, center=mean, data=df)   # Levene's test
-print(check_homogeneity(m))                          # Levene's test
+leveneTest(Minutes ~ Engine, data=df, center=median) # Brown-Forstye test (default)
+leveneTest(Minutes ~ Engine, data=df, center=mean)   # Levene's test
+check_homogeneity(m)                                 # Levene's test
 
 # one-way ANOVA
 anova(m)

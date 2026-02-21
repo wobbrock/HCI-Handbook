@@ -2,13 +2,13 @@
 ### 10_bayes.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/21/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -78,16 +78,18 @@ mean(df$Hours) # 22.5
 sd(df$Hours)   # 5.0
 
 # make a histogram
-hist(df$Hours, 
-     main="Distribution of CS Programming Hours", 
-     xlab="Hours",
-     ylab="Students",
-     xlim=c(10,40),
-     ylim=c(0,.1),
-     freq=FALSE)
+hist(
+  df$Hours, 
+  main="Distribution of CS Programming Hours", 
+  xlab="Hours",
+  ylab="Students",
+  xlim=c(10,40),
+  ylim=c(0, 0.1),
+  freq=FALSE
+)
 f = gofTest(df$Hours, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE)
-print(f)
+print.gof(f)
 
 # normality test
 shapiro.test(df$Hours)
@@ -134,17 +136,19 @@ ddply(df, ~ Engine, function(data) c(
 ))
 
 # boxplot
-boxplot(Minutes ~ Engine,
-        main="Minutes by Search Engine",
-        xlab="Search Engine",
-        ylab="Minutes",
-        col=c("lightblue","lightgreen"),
-        data=df)
+boxplot(
+  Minutes ~ Engine,
+  main="Minutes by Search Engine",
+  xlab="Search Engine",
+  ylab="Minutes",
+  col=c("lightblue","lightgreen"),
+  data=df
+)
 
 # build an ANOVA model and test normality and homoscedasticity
 m = aov_ez(dv="Minutes", between="Engine", id="PId", type=3, data=df)
-print(check_normality(m))   # Shapiro-Wilk
-print(check_homogeneity(m)) # Levene's test
+check_normality(m)[1]   # Shapiro-Wilk
+check_homogeneity(m)    # Levene's test
 
 # independent-samples t-test
 t.test(Minutes ~ Engine, var.equal=TRUE, data=df) # Student's
@@ -188,16 +192,18 @@ ddply(df, ~ Mouse, function(data) c(
 ))
 
 # boxplot
-boxplot(Throughput ~ Mouse,
-        main="Throughput by Mouse",
-        xlab="Mouse",
-        ylab="Throughput (bits/s)",
-        col=c("gray","lightblue"),
-        data=df)
+boxplot(
+  Throughput ~ Mouse,
+  main="Throughput by Mouse",
+  xlab="Mouse",
+  ylab="Throughput (bits/s)",
+  col=c("gray","lightblue"),
+  data=df
+)
 
 # build an ANOVA model and check normality
 m = aov_ez(dv="Throughput", within="Mouse", id="PId", type=3, data=df)
-print(check_normality(m))
+check_normality(m)[1]
 
 # paired-samples t-test
 df2 <- dcast(df, PId ~ Mouse, value.var="Throughput")  # make wide-format table
@@ -245,17 +251,16 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 ))
 
 # interaction plot with error bars
-with(df, 
-     interaction.plot(
-       Posture, 
-       Keyboard, 
-       WPM, 
-       ylim=c(min(WPM), max(WPM)), 
-       ylab="WPM",
-       main="WPM by Keyboard, Posture",
-       lty=c(2,1), 
-       lwd=c(3,3), 
-       col=c("darkgreen","darkgray")
+with(df, interaction.plot( 
+  Posture, 
+  Keyboard, 
+  WPM, 
+  ylim=c(min(WPM), max(WPM)), 
+  ylab="WPM",
+  main="WPM by Keyboard, Posture",
+  lty=c(2,1), 
+  lwd=c(3,3), 
+  col=c("darkgreen","darkgray")
 ))
 msd <- ddply(df, ~ Posture + Keyboard, function(data) c(
   "Mean"=mean(data$WPM), 
@@ -269,8 +274,8 @@ arrows(x0=2+dx, y0=msd[4,]$Mean - msd[4,]$SD, x1=2+dx, y1=msd[4,]$Mean + msd[4,]
 
 # build an ANOVA model and test normality and homoscedasticity
 m = aov_ez(dv="WPM", between=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m))   # Shapiro-Wilk test
-print(check_homogeneity(m)) # Levene's test
+check_normality(m)[1] # Shapiro-Wilk test
+check_homogeneity(m)  # Levene's test
 
 # two-way ANOVA
 anova(m)
@@ -336,7 +341,7 @@ View(df)
 
 # linear mixed model (LMM)
 m = lmer(WPM ~ Keyboard*Posture + (1|PId), data=df)
-print(check_normality(m)) # Shapiro-Wilk
+check_normality(m) # Shapiro-Wilk
 # no sphericity assumption for LMMs!
 
 # analysis of variance

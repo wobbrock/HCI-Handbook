@@ -2,13 +2,13 @@
 ### 06_lognormal.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/23/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -71,13 +71,15 @@ ddply(df, ~ IDE, function(data) c(
 ))
 
 # boxplot
-boxplot(Hours ~ IDE,
-        main="Hours by IDE",
-        xlab="IDE",
-        ylab="Hours",
-        ylim=c(0, max(df$Hours)),
-        col=c("pink","lightblue"),
-        data=df)
+boxplot(
+  Hours ~ IDE,
+  main="Hours by IDE",
+  xlab="IDE",
+  ylab="Hours",
+  ylim=c(0, max(df$Hours)),
+  col=c("pink","lightblue"),
+  data=df
+)
 
 # make two stacked histograms
 par(mfrow=c(2,1))
@@ -108,18 +110,18 @@ shapiro.test(df[df$IDE == "VStudio",]$Hours)
 hist(df[df$IDE == "Nobugs",]$Hours, main="Nobugs Hours", xlab="Hours", col="pink", freq=FALSE)
 f = gofTest(df[df$IDE == "Nobugs",]$Hours, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(df[df$IDE == "Nobugs",]$Hours, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # lognormal curve
-print(f)
+print.gof(f)
 
 hist(df[df$IDE == "VStudio",]$Hours, main="Microsoft Visual Studio Hours", xlab="Hours", col="lightblue", freq=FALSE)
 f = gofTest(df[df$IDE == "VStudio",]$Hours, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(df[df$IDE == "VStudio",]$Hours, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # lognormal curve
-print(f)
+print.gof(f)
 
 # normality of residuals
 Nobugs.mean = mean(df[df$IDE == "Nobugs",]$Hours)
@@ -138,14 +140,14 @@ df$Residuals.10 = df$Residuals + 10  # shift by +10 to make non-negative for log
 hist(df$Residuals.10, main="Histogram of Residuals", freq=FALSE)
 f = gofTest(df$Residuals.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(df$Residuals.10, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 
 # we can also build an ANOVA model and test residuals this way
 m = aov_ez(dv="Hours", between="IDE", id="PId", type=3, data=df)
-print(check_normality(m))
+check_normality(m)[1] # violation!
 
 r = residuals(m$lm) # extract residuals
 plot(r[1:length(r)], main="Plot of Residuals"); abline(h=0)
@@ -157,10 +159,10 @@ r.10 = r + 10  # shift by +10 to make non-negative for lognormal fit
 hist(r.10, main="Histogram of Residuals", freq=FALSE) # density
 f = gofTest(r.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(r.10, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 
 # take the log of the residuals and fit a normal curve to it
 log.r.10 = log(r.10)
@@ -169,7 +171,7 @@ qqnorm(log.r.10); qqline(log.r.10)
 hist(log.r.10, main="Histogram of log(Residuals)", freq=FALSE)
 f = gofTest(log.r.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 shapiro.test(log.r.10)
 
 # make a log-transformed dependent variable and re-test normality
@@ -180,7 +182,7 @@ shapiro.test(df[df$IDE == "Nobugs",]$logHours)
 shapiro.test(df[df$IDE == "VStudio",]$logHours)
 
 m = aov_ez(dv="logHours", between="IDE", id="PId", type=3, data=df)
-print(check_normality(m))
+check_normality(m)[1]
 
 r = residuals(m$lm) # extract residuals
 plot(r[1:length(r)], main="Plot of log(Hours) Residuals"); abline(h=0)
@@ -193,27 +195,29 @@ hist(r.1, main="Histogram of log(Hours) Residuals", freq=FALSE)
 
 f = gofTest(r.1, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(r.1, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 
 # visualize logHours before testing
-boxplot(logHours ~ IDE,
-        main="log(Hours) by IDE",
-        xlab="IDE",
-        ylab="log(Hours)",
-        col=c("pink","lightblue"),
-        data=df)
+boxplot(
+  logHours ~ IDE,
+  main="log(Hours) by IDE",
+  xlab="IDE",
+  ylab="log(Hours)",
+  col=c("pink","lightblue"),
+  data=df
+)
 
 # homogeneity of variance, a/k/a homoscedasticity
-leveneTest(logHours ~ IDE, center=median, data=df) # Brown-Forstye test (default)
-leveneTest(logHours ~ IDE, center=mean, data=df)   # Levene's test
-print(check_homogeneity(m))                        # same
+leveneTest(logHours ~ IDE, data=df, center=median) # Brown-Forstye test (default)
+leveneTest(logHours ~ IDE, data=df, center=mean)   # Levene's test
+check_homogeneity(m)                               # same
 
 # independent-samples t-test
-t.test(logHours ~ IDE, var.equal=TRUE, data=df)    # Student
-t.test(logHours ~ IDE, var.equal=FALSE, data=df)   # Welch
+t.test(logHours ~ IDE, var.equal=TRUE, data=df)    # Student's t-test
+t.test(logHours ~ IDE, var.equal=FALSE, data=df)   # Welch's t-test
 
 # Cohen's d effect size
 cohens_d(logHours ~ IDE, data=df)

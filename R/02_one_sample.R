@@ -2,13 +2,13 @@
 ### 02_one_sample.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/21/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -70,10 +70,11 @@ mean(df$Hours) # 22.5
 sd(df$Hours)   # 5.0
 
 # make a histogram
-hist(df$Hours, 
-     main="Distribution of CS Programming Hours", 
-     xlab="Hours",
-     ylab="Count"
+hist(
+  df$Hours, 
+  main="Distribution of CS Programming Hours", 
+  xlab="Hours",
+  ylab="Count"
 )
 
 # normality test of response
@@ -81,11 +82,12 @@ shapiro.test(df$Hours)
 
 # also compute each measure's residual
 df$Residual = df$Hours - mean(df$Hours)
-hist(df$Residual,
-     main="Programming Hours Residuals",
-     xlab="Residual",
-     ylab="Count",
-     xlim=c(-15,+15)
+hist(
+  df$Residual,
+  main="Programming Hours Residuals",
+  xlab="Residual",
+  ylab="Count",
+  xlim=c(-15,+15)
 )
 
 # for a single sample, the normality of the response
@@ -103,12 +105,12 @@ Bu = mean(df$Hours) + moe                # CI upper bound
 dx = mean(df$Hours) - 20.0               # delta x
 SE = (Bu - Bl) / (2*ca)                  # standard error
 Z = abs(dx / SE)                         # absolute Z-score
-p = exp(-0.717*Z - 0.416*Z*Z)            # p-value
+p = exp(-0.717*Z - 0.416*Z*Z)            # p-value (est.)
 
 print(Bl) # lower bound
 print(Bu) # upper bound
 print(Z)  # Z-score
-print(p)  # ~p-value
+print(p)  # p-value (est.)
 
 # or, we can just compute the Z-score and ask R for the p-value
 Z = (mean(df$Hours) - 20.0) / (sd(df$Hours)/ sqrt(nrow(df)))

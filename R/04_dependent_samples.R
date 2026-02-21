@@ -2,13 +2,13 @@
 ### 04_dependent_samples.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/22/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -73,12 +73,14 @@ ddply(df, ~ Mouse, function(data) c(
 ))
 
 # boxplot
-boxplot(Throughput ~ Mouse,
-        main="Throughput by Mouse",
-        xlab="Mouse",
-        ylab="Throughput (bits/s)",
-        col=c("gray","lightblue"),
-        data=df)
+boxplot(
+  Throughput ~ Mouse,
+  main="Throughput by Mouse",
+  xlab="Mouse",
+  ylab="Throughput (bits/s)",
+  col=c("gray","lightblue"),
+  data=df
+)
 
 # make two stacked histograms
 par(mfrow=c(2,1))
@@ -126,9 +128,9 @@ hist(r,xlim=c(-2,+2), ylim=c(0,12.8), main="Histogram of Residuals", freq=TRUE) 
 hist(r, xlim=c(-2,+2), ylim=c(0,0.8), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # paired-samples t-test
 df2 <- dcast(df, PId ~ Mouse, value.var="Throughput")  # make wide-format table
@@ -164,12 +166,14 @@ ddply(df, ~ Mouse, function(data) c(
 ))
 
 # boxplot
-boxplot(Throughput ~ Mouse,
-        main="Throughput by Mouse",
-        xlab="Mouse",
-        ylab="Throughput (bits/s)",
-        col=c("gray","lightblue","lightgreen"),
-        data=df)
+boxplot(
+  Throughput ~ Mouse,
+  main="Throughput by Mouse",
+  xlab="Mouse",
+  ylab="Throughput (bits/s)",
+  col=c("gray","lightblue","lightgreen"),
+  data=df
+)
 
 # make three stacked histograms
 par(mfrow=c(3,1))
@@ -228,13 +232,13 @@ hist(r, xlim=c(-2,+2), ylim=c(0,16.8), main="Histogram of Residuals", freq=TRUE)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.7), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # sphericity assumption
 summary(m)$sphericity.tests # Mauchly's test of sphericity
-print(check_sphericity(m))  # same
+check_sphericity(m) # same
 
 # one-way repeated measures ANOVA
 anova(m, correction="none") # use if p≥.05, no violation of sphericity

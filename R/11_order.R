@@ -2,13 +2,13 @@
 ### 11_order.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/23/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -75,11 +75,13 @@ ddply(df, ~ Order, function(data) c(
 ))
 
 # boxplot
-boxplot(Throughput ~ Order,
-        main="Throughput by Order",
-        xlab="Order",
-        ylab="Throughput (bits/s)",
-        data=df)
+boxplot(
+  Throughput ~ Order,
+  main="Throughput by Order",
+  xlab="Order",
+  ylab="Throughput (bits/s)",
+  data=df
+)
 
 # make three stacked histograms
 par(mfrow=c(3,1))
@@ -135,7 +137,7 @@ hist(r, xlim=c(-2,+2), ylim=c(0,14.5), main="Histogram of Residuals", freq=TRUE)
 hist(r, xlim=c(-2,+2), ylim=c(0,0.6), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f)    # Shapiro-Wilk test
 shapiro.test(r) # same
 
 # analysis of variance
@@ -159,7 +161,7 @@ hist(r, xlim=c(-1.5,+1.5), ylim=c(0,19), main="Histogram of Residuals", freq=TRU
 hist(r, xlim=c(-1.5,+1.5), ylim=c(0,0.8), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f)    # Shapiro-Wilk test
 shapiro.test(r) # same
 
 # analysis of variance

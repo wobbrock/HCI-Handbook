@@ -2,13 +2,13 @@
 ### 05_factorial.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/23/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -75,12 +75,14 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 ))
 
 # boxplot
-boxplot(WPM ~ Keyboard + Posture,
-        main="WPM by Keyboard, Posture",
-        xlab="Keyboard.Posture",
-        ylab="WPM",
-        col=c("lightgreen","lightgray","darkgreen","darkgray"),
-        data=df)
+boxplot(
+  WPM ~ Keyboard + Posture,
+  main="WPM by Keyboard, Posture",
+  xlab="Keyboard.Posture",
+  ylab="WPM",
+  col=c("lightgreen","lightgray","darkgreen","darkgray"),
+  data=df
+)
 
 # make four stacked histograms
 par(mfrow=c(4,1))
@@ -119,17 +121,16 @@ par(mfrow=c(4,1))
 par(mfrow=c(1,1))
 
 # interaction plot with error bars
-with(df, 
-  interaction.plot(
-    Posture, 
-    Keyboard, 
-    WPM, 
-    ylim=c(min(WPM), max(WPM)), 
-    ylab="WPM",
-    main="WPM by Keyboard, Posture",
-    lty=c(2,1), 
-    lwd=c(3,3), 
-    col=c("darkgreen","darkgray")
+with(df, interaction.plot(
+  Posture, 
+  Keyboard, 
+  WPM, 
+  ylim=c(min(WPM), max(WPM)), 
+  ylab="WPM",
+  main="WPM by Keyboard, Posture",
+  lty=c(2,1), 
+  lwd=c(3,3), 
+  col=c("darkgreen","darkgray")
 ))
 msd <- ddply(df, ~ Posture + Keyboard, function(data) c(
   "Mean"=mean(data$WPM), 
@@ -173,14 +174,14 @@ hist(r, xlim=c(-20,+20), ylim=c(0,16), main="Histogram of Residuals", freq=TRUE)
 hist(r, xlim=c(-20,+20), ylim=c(0,0.0665), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # homogeneity of variance, a/k/a homoscedasticity
-leveneTest(WPM ~ Keyboard*Posture, center=median, data=df) # Brown-Forstye test (default)
-leveneTest(WPM ~ Keyboard*Posture, center=mean, data=df)   # Levene's test
-print(check_homogeneity(m))                                # Levene's test
+leveneTest(WPM ~ Keyboard*Posture, data=df, center=median) # Brown-Forstye test (default)
+leveneTest(WPM ~ Keyboard*Posture, data=df, center=mean)   # Levene's test
+check_homogeneity(m)                                       # Levene's test
 
 # two-way ANOVA
 anova(m)
@@ -225,13 +226,13 @@ hist(r, xlim=c(-20,+20), ylim=c(0,16), main="Histogram of Residuals", freq=TRUE)
 hist(r, xlim=c(-20,+20), ylim=c(0,0.0665), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # sphericity assumption
 summary(m)$sphericity.tests # Mauchly's test of sphericity
-print(check_sphericity(m))  # same
+check_sphericity(m) # same
 
 # two-way repeated measures ANOVA
 anova(m, correction="none") # use if p≥.05, no violation of sphericity
@@ -274,16 +275,16 @@ hist(r, xlim=c(-20,+20), ylim=c(0,16), main="Histogram of Residuals", freq=TRUE)
 hist(r, xlim=c(-20,+20), ylim=c(0,0.0665), main="Histogram of Residuals", freq=FALSE) # density (area sums to 1.00)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f) # Shapiro-Wilk test
+print.gof(f) # Shapiro-Wilk test
 shapiro.test(r) # same
-print(check_normality(m)) # same
+check_normality(m)[1] # same
 
 # homogeneity of variance, a/k/a homoscedasticity
-print(check_homogeneity(m))
+check_homogeneity(m)
 
 # sphericity assumption
 summary(m)$sphericity.tests # Mauchly's test of sphericity
-print(check_sphericity(m))  # same
+check_sphericity(m) # same
 
 # two-way mixed factorial ANOVA
 anova(m, correction="none") # use if p≥.05, no violation of sphericity

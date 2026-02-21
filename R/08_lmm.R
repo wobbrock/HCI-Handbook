@@ -2,13 +2,13 @@
 ### 08_lmm.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/23/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -78,8 +78,8 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 
 # fixed-effects ANOVA
 m0 = aov_ez(dv="WPM", within=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m0))  # normality
-print(check_sphericity(m0)) # sphericity
+check_normality(m0)[1] # normality
+check_sphericity(m0)   # sphericity
 
 # two-way repeated measures ANOVA
 anova(m0, correction="none")
@@ -93,7 +93,8 @@ m = lmer(WPM ~ Keyboard*Posture + (1|PId), data=df)
 # normality
 r = residuals(m)
 qqnorm(r); qqline(r)
-shapiro.test(r)
+shapiro.test(r)    # Shapiro-Wilk test
+check_normality(m) # same
 
 # no sphericity assumption for LMMs!
 
@@ -138,9 +139,9 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 
 # fixed-effects ANOVA
 m0 = aov_ez(dv="WPM", between="Keyboard", within="Posture", id="PId", type=3, data=df)
-print(check_normality(m0))   # Shapiro-Wilk
-print(check_homogeneity(m0)) # Levene's test
-print(check_sphericity(m0))  # Mauchly's test of sphericity
+check_normality(m0)[1] # Shapiro-Wilk test
+check_homogeneity(m0)  # Levene's test
+check_sphericity(m0)   # Mauchly's test of sphericity
 
 # two-way repeated measures ANOVA
 anova(m0, correction="none")
@@ -154,10 +155,11 @@ m = lmer(WPM ~ Keyboard*Posture + (1|PId), data=df)
 # normality
 r = residuals(m)
 qqnorm(r); qqline(r)
-shapiro.test(r)
+shapiro.test(r)    # Shapiro-Wilk test
+check_normality(m) # same
 
 # homoscedasticity
-print(check_homogeneity(m))  # Bartlett's test
+check_homogeneity(m) # Bartlett's test
 
 # no sphericity assumption for LMMs!
 
@@ -210,13 +212,15 @@ ddply(df, ~ University, function(data) c(
 ))
 
 # boxplot
-boxplot(Hours ~ IDE,
-        main="Hours by IDE",
-        xlab="IDE",
-        ylab="Hours",
-        ylim=c(0, max(df$Hours)),
-        col=c("pink","lightblue"),
-        data=df)
+boxplot(
+  Hours ~ IDE,
+  main="Hours by IDE",
+  xlab="IDE",
+  ylab="Hours",
+  ylim=c(0, max(df$Hours)),
+  col=c("pink","lightblue"),
+  data=df
+)
 
 # make two stacked histograms
 par(mfrow=c(2,1))
@@ -246,18 +250,18 @@ shapiro.test(df[df$IDE == "VStudio",]$Hours)
 hist(df[df$IDE == "Nobugs",]$Hours, main="Nobugs Hours", xlab="Hours", ylim=c(0,0.2), col="pink", freq=FALSE)
 f = gofTest(df[df$IDE == "Nobugs",]$Hours, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(df[df$IDE == "Nobugs",]$Hours, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # lognormal curve
-print(f)
+print.gof(f)
 
 hist(df[df$IDE == "VStudio",]$Hours, main="Microsoft Visual Studio Hours", xlab="Hours", ylim=c(0,0.125), col="lightblue", freq=FALSE)
 f = gofTest(df[df$IDE == "VStudio",]$Hours, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(df[df$IDE == "VStudio",]$Hours, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # lognormal curve
-print(f)
+print.gof(f)
 
 # normality of residuals
 Nobugs.mean = mean(df[df$IDE == "Nobugs",]$Hours)
@@ -278,10 +282,10 @@ df$Residuals.10 = df$Residuals + 10  # shift by +10 to make non-negative for log
 hist(df$Residuals.10, main="Histogram of Residuals", ylim=c(0,0.15), freq=FALSE)
 f = gofTest(df$Residuals.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 f = gofTest(df$Residuals.10, distribution="lnorm")
 curve(dlnorm(x, meanlog=f$distribution.parameters[1], sdlog=f$distribution.parameters[2]), col="darkgreen", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 shapiro.test(df$Residuals.10)
 
 # take the log of the residuals and fit a normal curve to it
@@ -291,8 +295,8 @@ qqnorm(df$log.Residuals.10); qqline(df$log.Residuals.10)
 hist(df$log.Residuals.10, main="Histogram of log(Residuals)", freq=FALSE)
 f = gofTest(df$log.Residuals.10, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
-shapiro.test(df$log.Residuals.10)
+print.gof(f)
+shapiro.test(df$log.Residuals.10) # same
 
 # make a log-transformed dependent variable and re-test normality
 df$logHours = log(df$Hours)  # create new D.V.
@@ -302,12 +306,14 @@ shapiro.test(df[df$IDE == "Nobugs",]$logHours)
 shapiro.test(df[df$IDE == "VStudio",]$logHours)
 
 # visualize before testing
-boxplot(logHours ~ IDE,
-        main="log(Hours) by IDE",
-        xlab="IDE",
-        ylab="log(Hours)",
-        col=c("pink","lightblue"),
-        data=df)
+boxplot(
+  logHours ~ IDE,
+  main="log(Hours) by IDE",
+  xlab="IDE",
+  ylab="log(Hours)",
+  col=c("pink","lightblue"),
+  data=df
+)
 
 # build our LMM
 m = lmer(logHours ~ IDE + (1|App) + (1|University/PId), data=df)
@@ -320,12 +326,12 @@ qqnorm(r); qqline(r)
 hist(r, xlim=c(-1.5,+1.5), main="Histogram of Residuals", freq=FALSE)
 f = gofTest(r, distribution="norm")
 curve(dnorm(x, mean=f$distribution.parameters[1], sd=f$distribution.parameters[2]), col="blue", lty=1, lwd=3, add=TRUE) # normal curve
-print(f)
+print.gof(f)
 shapiro.test(r)
-print(check_normality(m))
+check_normality(m)
 
 # homoscedasticity
-print(check_homogeneity(m)) # Bartlett's test
+check_homogeneity(m) # Bartlett's test
 
 # analysis of variance
 Anova(m, type=3, test.statistic="F", white.adjust=TRUE)
@@ -362,13 +368,15 @@ ddply(df, ~ Company, function(data) c(
 ))
 
 # boxplot
-boxplot(Problems ~ Company,
-        main="Usability Problems Found by Company",
-        xlab="Company",
-        ylab="Problems",
-        ylim=c(0, max(df$Problems)),
-        col=c("tan1","lightgray","pink","lightgreen","lightblue","lightyellow"),
-        data=df)
+boxplot(
+  Problems ~ Company,
+  main="Usability Problems Found by Company",
+  xlab="Company",
+  ylab="Problems",
+  ylim=c(0, max(df$Problems)),
+  col=c("tan1","lightgray","pink","lightgreen","lightblue","lightyellow"),
+  data=df
+)
 
 # make 3x2 stacked histograms
 par(mfrow=c(3,2))
@@ -433,10 +441,10 @@ m = lmer(Problems ~ Company + (1|Company:PId) + (1|UI), data=df)  # correct!
 r = residuals(m)
 qqnorm(r); qqline(r)
 shapiro.test(r)
-print(check_normality(m))
+check_normality(m)
 
 # homoscedasticity
-print(check_homogeneity(m)) # Bartlett's test
+check_homogeneity(m) # Bartlett's test
 
 # analysis of variance
 Anova(m, type=3, test.statistic="F", white.adjust=TRUE)
@@ -475,12 +483,14 @@ ddply(df, ~ Week, function(data) c(
 ))
 
 # boxplot
-boxplot(Hours ~ Week,
-        main="Videogame Hours per Week",
-        xlab="Week",
-        ylab="Hours",
-        ylim=c(0, max(df$Hours)),
-        data=df)
+boxplot(
+  Hours ~ Week,
+  main="Videogame Hours per Week",
+  xlab="Week",
+  ylab="Hours",
+  ylim=c(0, max(df$Hours)),
+  data=df
+)
 
 # regression plot
 plot(Hours ~ as.numeric(Week), data=df, main="Videogame Hours per Week", xlab="Week", ylab="Hours")
@@ -621,17 +631,16 @@ BIC(m.lmer) # 181.6737
 colors = hcl.colors(10, palette="Dark 3") # store 10 colors
 
 # interaction plot with participants as the traces
-with(df, 
-  interaction.plot(
-    Week, 
-    PId, 
-    Hours, 
-    ylim=c(min(Hours), max(Hours)), 
-    ylab="Hours",
-    main="Videogame Hours per Week by Participant",
-    lty=1, 
-    lwd=3, 
-    col=colors
+with(df, interaction.plot(
+  Week, 
+  PId, 
+  Hours, 
+  ylim=c(min(Hours), max(Hours)), 
+  ylab="Hours",
+  main="Videogame Hours per Week by Participant",
+  lty=1, 
+  lwd=3, 
+  col=colors
 ))
 
 # turn Week to numeric for exploring intercepts and slopes

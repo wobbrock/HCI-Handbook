@@ -2,13 +2,13 @@
 ### 07_nonparametric.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/23/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -79,12 +79,14 @@ ddply(df, ~ Engine, function(data) c(
 ))
 
 # boxplot
-boxplot(Minutes ~ Engine,
-        main="Minutes by Search Engine",
-        xlab="Search Engine",
-        ylab="Minutes",
-        col=c("lightblue","lightgreen"),
-        data=df)
+boxplot(
+  Minutes ~ Engine,
+  main="Minutes by Search Engine",
+  xlab="Search Engine",
+  ylab="Minutes",
+  col=c("lightblue","lightgreen"),
+  data=df
+)
 
 # make two stacked histograms
 par(mfrow=c(2,1))
@@ -107,7 +109,7 @@ par(mfrow=c(2,1))
 par(mfrow=c(1,1))
 
 # independent-samples t-test
-t.test(Minutes ~ Engine, data=df, var.equal=TRUE)  # Student's
+t.test(Minutes ~ Engine, data=df, var.equal=TRUE)  # Student's t-test
 cohens_d(Minutes ~ Engine, data=df)
 
 # Brown-Mood median test
@@ -144,12 +146,14 @@ ddply(df, ~ Engine, function(data) c(
 ))
 
 # boxplot
-boxplot(Minutes ~ Engine,
-        main="Minutes by Search Engine",
-        xlab="Search Engine",
-        ylab="Minutes",
-        col=c("lightblue","tan1","lightgreen"),
-        data=df)
+boxplot(
+  Minutes ~ Engine,
+  main="Minutes by Search Engine",
+  xlab="Search Engine",
+  ylab="Minutes",
+  col=c("lightblue","tan1","lightgreen"),
+  data=df
+)
 
 # make three stacked histograms
 par(mfrow=c(3,1))
@@ -181,12 +185,12 @@ par(mfrow=c(1,1))
 
 # one-way ANOVA
 m = aov_ez(dv="Minutes", between="Engine", id="PId", type=3, data=df)
-print(check_normality(m))
-print(check_homogeneity(m))
+check_normality(m)[1]
+check_homogeneity(m)
 anova(m)
 
 # post hoc pairwise comparisons
-emmeans(m, pairwise ~ Engine, adjust="holm")  # post hoc pairwise comparisons
+emmeans(m, pairwise ~ Engine, adjust="holm") # post hoc pairwise comparisons
 
 # Kruskal-Wallis test
 kruskal_test(Minutes ~ Engine, data=df)
@@ -229,12 +233,14 @@ ddply(df, ~ Mouse, function(data) c(
 ))
 
 # boxplot
-boxplot(Throughput ~ Mouse,
-        main="Throughput by Mouse",
-        xlab="Mouse",
-        ylab="Throughput (bits/s)",
-        col=c("gray","lightblue"),
-        data=df)
+boxplot(
+  Throughput ~ Mouse,
+  main="Throughput by Mouse",
+  xlab="Mouse",
+  ylab="Throughput (bits/s)",
+  col=c("gray","lightblue"),
+  data=df
+)
 
 # make two stacked histograms
 par(mfrow=c(2,1))
@@ -298,12 +304,14 @@ ddply(df, ~ Mouse, function(data) c(
 ))
 
 # boxplot
-boxplot(Throughput ~ Mouse,
-        main="Throughput by Mouse",
-        xlab="Mouse",
-        ylab="Throughput (bits/s)",
-        col=c("gray","lightblue","lightgreen"),
-        data=df)
+boxplot(
+  Throughput ~ Mouse,
+  main="Throughput by Mouse",
+  xlab="Mouse",
+  ylab="Throughput (bits/s)",
+  col=c("gray","lightblue","lightgreen"),
+  data=df
+)
 
 # make three stacked histograms
 par(mfrow=c(3,1))
@@ -335,8 +343,8 @@ par(mfrow=c(1,1))
 
 # repeated measures ANOVA
 m = aov_ez(dv="Throughput", within="Mouse", id="PId", type=3, data=df)
-print(check_normality(m))
-print(check_sphericity(m))
+check_normality(m)[1]
+check_sphericity(m)
 anova(m, correction="none")
 
 # post hoc pairwise comparisons
@@ -388,12 +396,14 @@ ddply(df, ~ Keyboard + Posture, function(data) c(
 ))
 
 # boxplot
-boxplot(WPM ~ Keyboard + Posture,
-        main="WPM by Keyboard, Posture",
-        xlab="Keyboard.Posture",
-        ylab="WPM",
-        col=c("lightgreen","lightgray","darkgreen","darkgray"),
-        data=df)
+boxplot(
+  WPM ~ Keyboard + Posture,
+  main="WPM by Keyboard, Posture",
+  xlab="Keyboard.Posture",
+  ylab="WPM",
+  col=c("lightgreen","lightgray","darkgreen","darkgray"),
+  data=df
+)
 
 # make four stacked histograms
 par(mfrow=c(4,1))
@@ -432,17 +442,16 @@ par(mfrow=c(4,1))
 par(mfrow=c(1,1))
 
 # interaction plot with error bars
-with(df, 
-     interaction.plot(
-       Posture, 
-       Keyboard, 
-       WPM, 
-       ylim=c(min(WPM), max(WPM)), 
-       ylab="WPM",
-       main="WPM by Keyboard, Posture",
-       lty=c(2,1), 
-       lwd=c(3,3), 
-       col=c("darkgreen","darkgray")
+with(df, interaction.plot( 
+  Posture, 
+  Keyboard, 
+  WPM, 
+  ylim=c(min(WPM), max(WPM)), 
+  ylab="WPM",
+  main="WPM by Keyboard, Posture",
+  lty=c(2,1), 
+  lwd=c(3,3), 
+  col=c("darkgreen","darkgray")
 ))
 msd <- ddply(df, ~ Posture + Keyboard, function(data) c(
   "Mean"=mean(data$WPM), 
@@ -456,8 +465,8 @@ arrows(x0=2+dx, y0=msd[4,]$Mean - msd[4,]$SD, x1=2+dx, y1=msd[4,]$Mean + msd[4,]
 
 # two-way ANOVA
 m0 = aov_ez(dv="WPM", between=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m0))
-print(check_homogeneity(m0))
+check_normality(m0)[1]
+check_homogeneity(m0)
 anova(m0)
 
 # post hoc pairwise comparisons
@@ -493,8 +502,8 @@ summary(df)
 
 # build an ANOVA model
 m0 = aov_ez(dv="WPM", within=c("Keyboard","Posture"), id="PId", type=3, data=df)
-print(check_normality(m0))
-print(check_sphericity(m0))
+check_normality(m0)[1]
+check_sphericity(m0)
 anova(m0, correction="none")
 
 # post hoc pairwise comparisons
@@ -531,9 +540,9 @@ summary(df)
 
 # build an ANOVA model
 m0 = aov_ez(dv="WPM", between="Keyboard", within="Posture", id="PId", type=3, data=df)
-print(check_normality(m0))
-print(check_homogeneity(m0))
-print(check_sphericity(m0))
+check_normality(m0)[1]
+check_homogeneity(m0)
+check_sphericity(m0)
 anova(m0, correction="none")
 
 # post hoc pairwise comparisons

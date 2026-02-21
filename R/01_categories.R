@@ -2,13 +2,13 @@
 ### 01_categories.R
 ###
 ### HCI Handbook, 4th Edition
-### Copyright (C) 2025 CRC Press
+### Copyright (C) 2026 CRC Press
 ###
 ### Jacob O. Wobbrock, Ph.D.
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/21/2025
+### Last Updated: 02/21/2026
 ###
 
 ### BSD 2-Clause License
@@ -65,14 +65,15 @@ ddply(df, ~ Mobile, function(data) c(
 m <- ddply(df, ~ Mobile, function(data) c(
   "Nrows"=nrow(data)
 ))
-barplot(m[,2] ~ m[,1], 
-        beside=TRUE,
-        legend=FALSE,
-        main="Mobile Phone",
-        xlab="Phone",
-        ylab="Count",
-        ylim=c(0,60),
-        col=c("lightgreen","lightgray")
+barplot(
+  m[,2] ~ m[,1], 
+  beside=TRUE,
+  legend=FALSE,
+  main="Mobile Phone",
+  xlab="Phone",
+  ylab="Count",
+  ylim=c(0,60),
+  col=c("lightgreen","lightgray")
 )
 
 # make a crosstabs
@@ -115,14 +116,15 @@ ddply(df, ~ Desktop, function(data) c(
 m <- ddply(df, ~ Desktop, function(data) c(
   "Nrows"=nrow(data)
 ))
-barplot(m[,2] ~ m[,1],
-        beside=TRUE,
-        legend=FALSE,
-        main="Desktop OS",
-        xlab="Desktop",
-        ylab="Count",
-        ylim=c(0,50),
-        col=c("lightgreen","lightgray", "lightblue")
+barplot(
+  m[,2] ~ m[,1],
+  beside=TRUE,
+  legend=FALSE,
+  main="Desktop OS",
+  xlab="Desktop",
+  ylab="Count",
+  ylim=c(0,50),
+  col=c("lightgreen","lightgray", "lightblue")
 )
 
 # make a crosstabs
@@ -171,18 +173,21 @@ ddply(df, ~ Mobile + Desktop, function(data) c(
 m <- ddply(df, ~ Mobile + Desktop, function(data) c(
   "Nrows"=nrow(data)
 ))
-barplot(m[,3] ~ m[,1] + m[,2],
-        beside=TRUE,
-        legend=FALSE,
-        main="Desktop UI Preference by Mobile Phone Ownership",
-        xlab="Desktop Preference",
-        ylab="Count",
-        ylim=c(0,50),
-        col=c("lightgreen","lightgray")
+barplot(
+  m[,3] ~ m[,1] + m[,2],
+  beside=TRUE,
+  legend=FALSE,
+  main="Desktop UI Preference by Mobile Phone Ownership",
+  xlab="Desktop Preference",
+  ylab="Count",
+  ylim=c(0,50),
+  col=c("lightgreen","lightgray")
 )
-legend("topright", 
-       c("Android","iPhone"), title="Mobile Phone", 
-       fill=c("lightgreen","lightgray")
+legend(
+  "topright", 
+  c("Android","iPhone"), 
+  title="Mobile Phone", 
+  fill=c("lightgreen","lightgray")
 )
 
 # make a crosstabs
@@ -231,18 +236,21 @@ ddply(df, ~ Mobile + Desktop, function(data) c(
 m <- ddply(df, ~ Mobile + Desktop, function(data) c(
   "Nrows"=nrow(data)
 ))
-barplot(m[,3] ~ m[,1] + m[,2],
-        beside=TRUE,
-        legend=FALSE,
-        main="Desktop UI Preference by Mobile Phone Ownership",
-        xlab="Desktop Preference",
-        ylab="Count",
-        ylim=c(0,50),
-        col=c("lightgreen","lightgray")
+barplot(
+  m[,3] ~ m[,1] + m[,2],
+  beside=TRUE,
+  legend=FALSE,
+  main="Desktop UI Preference by Mobile Phone Ownership",
+  xlab="Desktop Preference",
+  ylab="Count",
+  ylim=c(0,50),
+  col=c("lightgreen","lightgray")
 )
-legend("topright", 
-       c("Android","iPhone"), title="Mobile Phone", 
-       fill=c("lightgreen","lightgray")
+legend(
+  "topright", 
+  c("Android","iPhone"), 
+  title="Mobile Phone", 
+  fill=c("lightgreen","lightgray")
 )
 
 # make a crosstabs
