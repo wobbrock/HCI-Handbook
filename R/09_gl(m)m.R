@@ -37,20 +37,20 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply
-library(car) # for Anova
-library(emmeans) # for emmeans
-library(lme4) # for glmer
-library(lmerTest)
-library(nnet) # for multinom
-library(multpois) # for glm*.mp*, Anova.mp
-library(MASS) # for polr, glm.nb
-library(ordinal) # for clmm
+library(plyr)          # for ddply
+library(car)           # for Anova
+library(emmeans)       # for emmeans
+library(lme4)          # for glmer
+library(lmerTest)      # for glmer
+library(nnet)          # for multinom
+library(multpois)      # for glm*.mp*, Anova.mp
+library(MASS)          # for polr, glm.nb
+library(ordinal)       # for clmm
 library(RVAideMemoire) # for Anova.clmm
-library(fitdistrplus) # for fitdist, gofstat
-library(performance) # for check_overdispersion
-library(glmmTMB) # for glmmTMB
-library(EnvStats) # for gofTest
+library(fitdistrplus)  # for fitdist, gofstat
+library(performance)   # for check_overdispersion
+library(glmmTMB)       # for glmmTMB
+library(EnvStats)      # for gofTest
 
 
 ##

@@ -37,8 +37,8 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply
-library(BSDA) # for z.test
+library(plyr)       # for ddply
+library(BSDA)       # for z.test
 library(effectsize) # for cohens_d
 
 

@@ -37,13 +37,13 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply
-library(dplyr) # for case_match
-library(EnvStats) # for gofTest
-library(lme4) # for lmer
-library(lmerTest)
-library(car) # for Anova
-library(emmeans) # for emmeans
+library(plyr)       # for ddply
+library(dplyr)      # for case_match
+library(EnvStats)   # for gofTest
+library(lme4)       # for lmer
+library(lmerTest)   # for lmer
+library(car)        # for Anova
+library(emmeans)    # for emmeans
 library(effectsize) # for eta_squared
 
 

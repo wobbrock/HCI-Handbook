@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/21/2026
+### Last Updated: 03/15/2026
 ###
 
 ### BSD 2-Clause License
@@ -37,17 +37,18 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply, laply
-library(reshape2) # for dcast
-library(EnvStats) # for gofTest
+library(plyr)        # for ddply, laply
+library(reshape2)    # for dcast
+library(EnvStats)    # for gofTest
+library(effectsize)  # for cohens_d, eta_squared
 library(BayesFactor) # for ttestBF, anoveBF, posterior 
-library(bayestestR) # for hdi
-library(afex) # for aov_ez
+library(bayestestR)  # for hdi
+library(afex)        # for aov_ez
 library(performance) # for check_*
-library(lme4) # for lmer
-library(lmerTest)
-library(car) # for Anova
-library(emmeans) # for emmeans
+library(lme4)        # for lmer
+library(lmerTest)    # for lmer
+library(car)         # for Anova
+library(emmeans)     # for emmeans
 
 
 ##
@@ -96,17 +97,17 @@ shapiro.test(df$Hours)
 
 # one-sample t.test
 t.test(df$Hours, mu=20.0)
+cohens_d(df$Hours, mu=20.0)
 
 ## Bayesian approach
 bf = ttestBF(df$Hours, mu=20.0)
 print(bf)  # BF = 1.244134, "anecdotal evidence for H1"
 
 chains = posterior(bf, iterations=1000)
-summary(chains)
-head(chains)
-plot(chains[,1]) # "mu"
-mean(chains[,1])
-hdi(chains[,1])
+colnames(chains)
+plot(chains[,"mu"])
+mean(chains[,"mu"])
+hdi(chains[,"mu"])
 
 
 
@@ -152,17 +153,18 @@ check_homogeneity(m)    # Levene's test
 
 # independent-samples t-test
 t.test(Minutes ~ Engine, var.equal=TRUE, data=df) # Student's
+cohens_d(Minutes ~ Engine, data=df)
+
 
 ## Bayesian approach
 bf = ttestBF(formula = Minutes ~ Engine, data=df)
 print(bf)  # BF = 1.28696, "anecdotal evidence for H1"
 
 chains = posterior(bf, iterations=1000)
-summary(chains)
-head(chains)
-plot(chains[,2]) # "beta"
-mean(chains[,2])
-hdi(chains[,2])
+colnames(chains)
+plot(chains[,"beta (Bing - Google)"])
+mean(chains[,"beta (Bing - Google)"])
+hdi(chains[,"beta (Bing - Google)"])
 
 
 
@@ -209,17 +211,17 @@ check_normality(m)[1]
 df2 <- dcast(df, PId ~ Mouse, value.var="Throughput")  # make wide-format table
 View(df2)  # view wide-format table
 t.test(df2$Logitech, df2$Microsoft, paired=TRUE)
+cohens_d(df2$Logitech, df2$Microsoft, paired=TRUE)
 
 ## Bayesian approach
 bf = ttestBF(df2$Logitech, df2$Microsoft, paired=TRUE)
 print(bf)  # BF = 0.5299686, "anecdotal evidence for H0"
 
 chains = posterior(bf, iterations=1000)
-summary(chains)
-head(chains)
-plot(chains[,1]) # "mu"
-mean(chains[,1])
-hdi(chains[,1])
+colnames(chains)
+plot(chains[,"mu"])
+mean(chains[,"mu"])
+hdi(chains[,"mu"])
 
 
 
@@ -287,38 +289,95 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 bf = anovaBF(formula = WPM ~ Keyboard*Posture, data=df)
 print(bf)
 
-# to sample from the posterior, provide an index 1-4
-chains = posterior(bf, index=4, iterations=1000) # index=4 for Keyboard*Posture
-summary(chains)
-head(chains)
-plot(chains[,6:9])
-laply(6:9, \(x) mean(chains[,x]))
-hdi(chains[,6:9])
+# Sample from the full factorial model, index 4
+chains = posterior(bf, index=4, iterations=1000)
+colnames(chains)
 
-# manual post hoc pairwise comparisons
-dv1 = df[df$Keyboard == "Android" & df$Posture == "standing",]$WPM
-dv2 = df[df$Keyboard == "Android" & df$Posture == "walking",]$WPM
-ttestBF(dv1, dv2)
+# Compute posterior distributions for each condition
+Android_standing = 
+  chains[,"mu"] +
+  chains[,"Keyboard-Android"] +
+  chains[,"Posture-standing"] +
+  chains[,"Keyboard:Posture-Android.&.standing"]
 
-dv1 = df[df$Keyboard == "Android" & df$Posture == "standing",]$WPM
-dv2 = df[df$Keyboard == "iPhone" & df$Posture == "standing",]$WPM
-ttestBF(dv1, dv2)
+Android_walking = 
+  chains[,"mu"] +
+  chains[,"Keyboard-Android"] +
+  chains[,"Posture-walking"] +
+  chains[,"Keyboard:Posture-Android.&.walking"]
 
-dv1 = df[df$Keyboard == "Android" & df$Posture == "standing",]$WPM
-dv2 = df[df$Keyboard == "iPhone" & df$Posture == "walking",]$WPM
-ttestBF(dv1, dv2)
+iPhone_standing = 
+  chains[,"mu"] +
+  chains[,"Keyboard-iPhone"] +
+  chains[,"Posture-standing"] +
+  chains[,"Keyboard:Posture-iPhone.&.standing"]
 
-dv1 = df[df$Keyboard == "Android" & df$Posture == "walking",]$WPM
-dv2 = df[df$Keyboard == "iPhone" & df$Posture == "standing",]$WPM
-ttestBF(dv1, dv2)
+iPhone_walking = 
+  chains[,"mu"] +
+  chains[,"Keyboard-iPhone"] +
+  chains[,"Posture-walking"] +
+  chains[,"Keyboard:Posture-iPhone.&.walking"]
 
-dv1 = df[df$Keyboard == "Android" & df$Posture == "walking",]$WPM
-dv2 = df[df$Keyboard == "iPhone" & df$Posture == "walking",]$WPM
-ttestBF(dv1, dv2)
+par(mfrow=c(4,1))
+  plot(density(Android_standing), xlim=c(30,70), ylim=c(0,0.225))
+  plot(density(Android_walking), xlim=c(30,70), ylim=c(0,0.225))
+  plot(density(iPhone_standing), xlim=c(30,70), ylim=c(0,0.225))
+  plot(density(iPhone_walking), xlim=c(30,70), ylim=c(0,0.225))
+par(mfrow=c(1,1))
 
-dv1 = df[df$Keyboard == "iPhone" & df$Posture == "standing",]$WPM
-dv2 = df[df$Keyboard == "iPhone" & df$Posture == "walking",]$WPM
-ttestBF(dv1, dv2)
+# Calculate posterior means and HDIs for each condition
+mean(Android_standing)
+hdi(Android_standing)
+
+mean(Android_walking)
+hdi(Android_walking)
+
+mean(iPhone_standing)
+hdi(iPhone_standing)
+
+mean(iPhone_walking)
+hdi(iPhone_walking)
+
+# Calculate effect posteriors and HDIs
+Keyboard_effect =
+  ((Android_standing + Android_walking) / 2) -
+  ((iPhone_standing + iPhone_walking) / 2)
+hdi(Keyboard_effect)
+
+Posture_effect =
+  ((Android_standing + iPhone_standing) / 2) -
+  ((Android_walking + iPhone_walking) / 2)
+hdi(Posture_effect)
+
+Keyboard_x_Posture_effect =
+  (Android_standing - Android_walking) -
+  (iPhone_standing - iPhone_walking)
+hdi(Keyboard_x_Posture_effect)
+
+# Check post hoc pairwise comparisons for HDIs excluding zero
+d1 = Android_standing - iPhone_standing
+mean(d1)
+hdi(d1)
+
+d2 = Android_standing - Android_walking
+mean(d2)
+hdi(d2)
+
+d3 = Android_standing - iPhone_walking
+mean(d3)
+hdi(d3)
+
+d4 = iPhone_standing - Android_walking
+mean(d4)
+hdi(d4)
+
+d5 = iPhone_standing - iPhone_walking
+mean(d5)
+hdi(d5)
+
+d6 = Android_walking - iPhone_walking
+mean(d6)
+hdi(d6)
 
 
 
@@ -346,6 +405,7 @@ check_normality(m) # Shapiro-Wilk
 
 # analysis of variance
 Anova(m, type=3, test.statistic="F")
+eta_squared(m, partial=TRUE)
 
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
@@ -354,23 +414,94 @@ emmeans(m, pairwise ~ Keyboard*Posture, adjust="holm")
 bf = anovaBF(formula = WPM ~ Keyboard*Posture + PId, whichRandom="PId", data=df)
 print(bf)
 
-# to sample from the posterior, provide an index 1-4
-chains = posterior(bf, index=4, iterations=1000) # index=4 for Keyboard*Posture + PId
-summary(chains)
-head(chains)
-plot(chains[,18:21])
-laply(18:21, \(x) mean(chains[,x]))
-hdi(chains[,18:21])
+# Sample from the full factorial model, index 4
+chains = posterior(bf, index=4, iterations=1000)
+colnames(chains)
 
-# manual post hoc pairwise comparisons
-df2 <- dcast(df, PId ~ Keyboard + Posture, value.var="WPM") # go wide
-View(df2)
+# Compute posterior distributions for each condition
+Android_standing = 
+  chains[,"mu"] +
+  chains[,"Keyboard-Android"] +
+  chains[,"Posture-standing"] +
+  chains[,"Keyboard:Posture-Android.&.standing"]
 
-ttestBF(df2$Android_standing, df2$Android_walking, paired=TRUE)
-ttestBF(df2$Android_standing, df2$iPhone_standing, paired=TRUE)
-ttestBF(df2$Android_standing, df2$iPhone_walking,  paired=TRUE)
-ttestBF(df2$Android_walking,  df2$iPhone_standing, paired=TRUE)
-ttestBF(df2$Android_walking,  df2$iPhone_walking,  paired=TRUE)
-ttestBF(df2$iPhone_standing,  df2$iPhone_walking,  paired=TRUE)
+Android_walking = 
+  chains[,"mu"] +
+  chains[,"Keyboard-Android"] +
+  chains[,"Posture-walking"] +
+  chains[,"Keyboard:Posture-Android.&.walking"]
+
+iPhone_standing = 
+  chains[,"mu"] +
+  chains[,"Keyboard-iPhone"] +
+  chains[,"Posture-standing"] +
+  chains[,"Keyboard:Posture-iPhone.&.standing"]
+
+iPhone_walking = 
+  chains[,"mu"] +
+  chains[,"Keyboard-iPhone"] +
+  chains[,"Posture-walking"] +
+  chains[,"Keyboard:Posture-iPhone.&.walking"]
+
+par(mfrow=c(4,1))
+  plot(density(Android_standing), xlim=c(30,65), ylim=c(0,0.225))
+  plot(density(Android_walking), xlim=c(30,65), ylim=c(0,0.225))
+  plot(density(iPhone_standing), xlim=c(30,65), ylim=c(0,0.225))
+  plot(density(iPhone_walking), xlim=c(30,65), ylim=c(0,0.225))
+par(mfrow=c(1,1))
+
+# Calculate posterior means and HDIs for each condition
+mean(Android_standing)
+hdi(Android_standing)
+
+mean(Android_walking)
+hdi(Android_walking)
+
+mean(iPhone_standing)
+hdi(iPhone_standing)
+
+mean(iPhone_walking)
+hdi(iPhone_walking)
+
+# Calculate effect posteriors and HDIs
+Keyboard_effect =
+  ((Android_standing + Android_walking) / 2) -
+  ((iPhone_standing + iPhone_walking) / 2)
+hdi(Keyboard_effect)
+
+Posture_effect =
+  ((Android_standing + iPhone_standing) / 2) -
+  ((Android_walking + iPhone_walking) / 2)
+hdi(Posture_effect)
+
+Keyboard_x_Posture_effect =
+  (Android_standing - Android_walking) -
+  (iPhone_standing - iPhone_walking)
+hdi(Keyboard_x_Posture_effect)
+
+# Check post hoc pairwise comparisons for HDIs excluding zero
+d1 = Android_standing - iPhone_standing
+mean(d1)
+hdi(d1)
+
+d2 = Android_standing - Android_walking
+mean(d2)
+hdi(d2)
+
+d3 = Android_standing - iPhone_walking
+mean(d3)
+hdi(d3)
+
+d4 = iPhone_standing - Android_walking
+mean(d4)
+hdi(d4)
+
+d5 = iPhone_standing - iPhone_walking
+mean(d5)
+hdi(d5)
+
+d6 = Android_walking - iPhone_walking
+mean(d6)
+hdi(d6)
 
 

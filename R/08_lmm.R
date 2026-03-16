@@ -37,16 +37,16 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply, l_ply
-library(lme4) # for lmer
-library(lmerTest) # for lmer
-library(nlme) # for lme
-library(emmeans) # for emmeans
-library(car) # for leveneTest, Anova
-library(afex) # for for aov_ez
+library(plyr)        # for ddply, l_ply
+library(lme4)        # for lmer
+library(lmerTest)    # for lmer
+library(nlme)        # for lme
+library(emmeans)     # for emmeans
+library(car)         # for leveneTest, Anova
+library(afex)        # for for aov_ez
 library(performance) # for check_*
-library(effectsize) # for eta_squared
-library(EnvStats) # for gofTest
+library(effectsize)  # for eta_squared
+library(EnvStats)    # for gofTest
 
 
 ##

@@ -37,10 +37,10 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply
-library(XNomial) # for xmulti
+library(plyr)          # for ddply
+library(XNomial)       # for xmulti
 library(RVAideMemoire) # for G.test
-library(coin) # for symmetry_test, sign_test
+library(coin)          # for symmetry_test, sign_test
 
 
 ##

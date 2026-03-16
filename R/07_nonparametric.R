@@ -37,20 +37,20 @@
 ### OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-library(plyr) # for ddply
-library(effectsize) # for cohens_d
-library(afex) # for aov_ez
-library(emmeans) # for emmeans
-library(coin) # for median_test, 
-              #     wilcox_test, 
-              #     kruskal_test, 
-              #     sign_test, 
-              #     wilcoxsign_test, 
-              #     friedman_test
-library(rcompanion) # for wilcoxonZ
-library(reshape2) # for dcast
+library(plyr)        # for ddply
+library(effectsize)  # for cohens_d
+library(afex)        # for aov_ez
+library(emmeans)     # for emmeans
+library(coin)        # for median_test, 
+                     #     wilcox_test, 
+                     #     kruskal_test, 
+                     #     sign_test, 
+                     #     wilcoxsign_test, 
+                     #     friedman_test
+library(rcompanion)  # for wilcoxonZ
+library(reshape2)    # for dcast
 library(performance) # for check_*
-library(ARTool) # for art, art.con
+library(ARTool)      # for art, art.con
 
 
 ##
