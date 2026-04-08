@@ -8,7 +8,7 @@
 ### University of Washington
 ### wobbrock@uw.edu
 ###
-### Last Updated: 02/21/2026
+### Last Updated: 04/07/2026
 ###
 
 ### BSD 2-Clause License
@@ -46,7 +46,6 @@ library(nnet)          # for multinom
 library(multpois)      # for glm*.mp*, Anova.mp
 library(MASS)          # for polr, glm.nb
 library(ordinal)       # for clmm
-library(RVAideMemoire) # for Anova.clmm
 library(fitdistrplus)  # for fitdist, gofstat
 library(performance)   # for check_overdispersion
 library(glmmTMB)       # for glmmTMB
@@ -290,7 +289,7 @@ arrows(x0=2-dx, y0=msd[3,]$Mean - msd[3,]$SD, x1=2-dx, y1=msd[3,]$Mean + msd[3,]
 arrows(x0=2+dx, y0=msd[4,]$Mean - msd[4,]$SD, x1=2+dx, y1=msd[4,]$Mean + msd[4,]$SD, angle=90, code=3, lty=1, lwd=2, length=0.3, col="blue")
 
 # ordinal logistic regression
-m = polr(Agreement ~ Technique*Hands, data=df, Hess=TRUE)
+m = polr(Agreement ~ Technique*Hands, data=df, Hess=TRUE, method="logistic")
 Anova(m, type=3)
 
 # post hoc pairwise comparisons
@@ -304,23 +303,22 @@ emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
 ##   ..mixed ordinal logistic regression
 ##
 
-# prepare data table. name it 'dt' to avoid an Anova.clmm bug
-# that throws an error if it is named 'df'.
-dt <- read.csv(".\\data\\09c_glmm.csv")
-dt$PId = factor(dt$PId)
-dt$Technique = factor(dt$Technique)
-dt$Hands = factor(dt$Hands)
-dt$Agreement = ordered(dt$Agreement) # D.V.
-contrasts(dt$Technique) <- "contr.sum"
-contrasts(dt$Hands) <- "contr.sum"
-View(dt)
+# prepare data table
+df <- read.csv(".\\data\\09c_glmm.csv")
+df$PId = factor(df$PId)
+df$Technique = factor(df$Technique)
+df$Hands = factor(df$Hands)
+df$Agreement = ordered(df$Agreement) # D.V.
+contrasts(df$Technique) <- "contr.sum"
+contrasts(df$Hands) <- "contr.sum"
+View(df)
 
 # The data is the same as 09c_glm.csv, but now within-subjects, not between-
 # subjects; therefore, we skip the descriptive statistics and visualizations.
 
 # mixed ordinal logistic regression
-m = clmm(Agreement ~ Technique*Hands + (1|PId), data=dt)
-Anova.clmm(m)
+m = clmm(Agreement ~ Technique*Hands + (1|PId), data=df, Hess=TRUE, link="logit")
+Anova(m, type=3)
 
 # post hoc pairwise comparisons
 emmeans(m, pairwise ~ Technique*Hands, adjust="holm")
