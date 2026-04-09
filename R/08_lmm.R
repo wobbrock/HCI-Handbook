@@ -13,7 +13,7 @@
 
 ### BSD 2-Clause License
 ###
-### Copyright (c) 2024, Jacob O. Wobbrock
+### Copyright (c) 2024-2026, Jacob O. Wobbrock
 ### 
 ### Redistribution and use in source and binary forms, with or without
 ### modification, are permitted provided that the following conditions are met:
